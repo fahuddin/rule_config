@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rule Configuration</title>
+    <style>
+      :root{--bg:#ffffff;--card:#ffffff;--accent:#0f172a;--muted:#6b7280;--border:#e5e7eb}
+      html,body{height:100%}
+      body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#000;display:flex;align-items:flex-start;justify-content:center;padding:32px}
+      .container{width:980px;max-width:96%}
+      .card{background:var(--card);border-radius:12px;padding:22px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid var(--border)}
+      h1{margin:0 0 8px;font-size:20px}
+      p.lead{margin:0 0 18px;color:var(--muted)}
+
+      .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
+      @media (max-width:920px){.grid{grid-template-columns:1fr}}
+
+      .form-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}
+      label.field{font-size:0.85rem;color:var(--muted);display:block;margin-bottom:6px}
+      select,input[type=text],textarea{padding:10px;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box}
+
+      .section{background:#fff;padding:12px;border-radius:10px;border:1px solid var(--border)}
+      .section h3{margin:0 0 8px;font-size:14px}
+      .muted{color:var(--muted);font-size:0.9rem}
+
+      .footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+      button.primary{background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;border:0;cursor:pointer}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>Rule Configuration</h1>
+        <p class="lead">Select application/module, rule type and name to edit rule details.</p>
+
+        <div class="grid">
+          <div>
+            <div class="section">
+              <h3>Application / Module</h3>
+              <div class="form-row">
+                <div>
+                  <label class="field">Application</label>
+                  <select id="appSelect">
+                    <option value="IFL">IFL</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field">Sub-module</label>
+                  <select id="subSelect">
+                    <option value="Cash">Cash</option>
+                    <option value="Payment">Payment</option>
+                    <option value="Transfer">Transfer</option>
+                  </select>
+                </div>
+              </div>
+
+              <h3 style="margin-top:12px">Rule Type &amp; Rule</h3>
+              <div class="form-row">
+                <div>
+                  <label class="field">Rule Type</label>
+                  <select id="typeSelect">
+                    <option value="ReferenceFileValidation">ReferenceFileValidation</option>
+                    <option value="AccountsValidation">AccountsValidation</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field">Rule Name</label>
+                  <select id="ruleSelect">
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px" class="section">
+              <h3>Rule Details</h3>
+              <div style="margin-bottom:8px">
+                <label class="field">Rule Definition</label>
+                <textarea id="ruleDef" rows="6" placeholder="Enter or edit rule definition"></textarea>
+              </div>
+              <div>
+                <label class="field">Rule Description</label>
+                <textarea id="ruleDesc" rows="3" placeholder="Friendly description of the rule"></textarea>
+              </div>
+
+              <div class="footer">
+                <div class="muted">Changes are local in this demo.</div>
+                <div>
+                  <button class="primary" id="saveBtn">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section">
+              <h3>Selected Context</h3>
+              <div style="margin-top:8px">
+                <p><strong>Application:</strong> <span id="ctxApp">IFL</span></p>
+                <p><strong>Sub-module:</strong> <span id="ctxSub">Cash</span></p>
+                <p><strong>Rule Type:</strong> <span id="ctxType">ReferenceFileValidation</span></p>
+                <p><strong>Rule Name:</strong> <span id="ctxName">-</span></p>
+              </div>
+            </div>
+
+            <div style="margin-top:12px" class="section">
+              <h3>Help</h3>
+              <div class="muted">Rule lists are filtered by the selected Rule Type. Edit definition and description, then click Save.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Data maps
+      const ruleMap = {
+        'ReferenceFileValidation': ['DuplicateValidation','MandatoryFieldValidation'],
+        'AccountsValidation': ['AccountFieldRule']
+      };
+
+      // Prefilled rule definitions & descriptions (fallback)
+      const ruleData = {
+        'DuplicateValidation': {
+          definition: 'Check input file for duplicate rows based on key columns and flag duplicates for review.',
+          description: 'Identifies duplicate reference entries to prevent double processing.'
+        },
+        'MandatoryFieldValidation': {
+          definition: 'Ensure required fields are present and non-empty for every record; list missing fields per row.',
+          description: 'Validates that mandatory reference fields are supplied.'
+        },
+        'AccountFieldRule': {
+          definition: 'Validate account numbers against allowed patterns and check account status via lookup table.',
+          description: 'Performs syntactic and semantic checks on account fields.'
+        }
+      };
+
+      // Elements
+      const typeSelect = document.getElementById('typeSelect');
+      const ruleSelect = document.getElementById('ruleSelect');
+      const preview = document.getElementById('preview');
+      const ctxApp = document.getElementById('ctxApp');
+      const ctxSub = document.getElementById('ctxSub');
+      const ctxType = document.getElementById('ctxType');
+      const ctxName = document.getElementById('ctxName');
+      const appSelect = document.getElementById('appSelect');
+      const subSelect = document.getElementById('subSelect');
+      const ruleDef = document.getElementById('ruleDef');
+      const ruleDesc = document.getElementById('ruleDesc');
+      const saveBtn = document.getElementById('saveBtn');
+
+      function populateRulesForType(type){
+        ruleSelect.innerHTML = '';
+        const list = ruleMap[type] || [];
+        list.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r; opt.textContent = r;
+          ruleSelect.appendChild(opt);
+        });
+        if(list.length) ruleSelect.selectedIndex = 0;
+        // generate definition for initial selection
+        const first = ruleSelect.value;
+        if(first) generateDefinition(first);
+      }
+
+      function updatePreview(){
+        const type = typeSelect.value;
+        const rule = ruleSelect.value || '-';
+        ctxType.textContent = type;
+        ctxName.textContent = rule;
+      }
+
+      // Use local prefilled data for rule definition/description
+      function generateDefinition(rule){
+        ctxName.textContent = rule;
+        if(rule && ruleData[rule]){
+          ruleDef.value = ruleData[rule].definition;
+          ruleDesc.value = ruleData[rule].description;
+        } else {
+          ruleDef.value = '';
+          ruleDesc.value = '';
+        }
+        updatePreview();
+      }
+
+      // initial populate
+      populateRulesForType(typeSelect.value);
+      ctxApp.textContent = appSelect.value;
+      ctxSub.textContent = subSelect.value;
+
+      // event listeners
+      typeSelect.addEventListener('change', ()=>{ populateRulesForType(typeSelect.value); });
+      ruleSelect.addEventListener('change', ()=>{ generateDefinition(ruleSelect.value); });
+      appSelect.addEventListener('change', ()=>{ ctxApp.textContent = appSelect.value; });
+      subSelect.addEventListener('change', ()=>{ ctxSub.textContent = subSelect.value; });
+
+      saveBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const payload = {
+          application: appSelect.value,
+          submodule: subSelect.value,
+          ruleType: typeSelect.value,
+          ruleName: ruleSelect.value,
+          definition: ruleDef.value,
+          description: ruleDesc.value
+        };
+        // For now just show preview and log — in a real app we'd POST this to the server
+        console.log('Save payload:', payload);
+        alert('Rule saved locally (demo). Check console for payload.');
+      });
+    </script>
+  </body>
+</html>

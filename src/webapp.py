@@ -9,6 +9,11 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB upload limit
 def index():
     return render_template('index.html')
 
+
+@app.route('/rule-config', methods=['GET'])
+def rule_config():
+    return render_template('rule_config.html')
+
 @app.route('/process', methods=['POST'])
 def process():
     mode = request.form.get('mode', 'explain')
@@ -27,6 +32,9 @@ def process():
         result = f"Error running agent: {e}"
 
     return render_template('result.html', mode=mode, filename=uploaded.filename, output=result)
+
+
+# Note: AI generation endpoint removed — rule definitions are prefilled locally.
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
