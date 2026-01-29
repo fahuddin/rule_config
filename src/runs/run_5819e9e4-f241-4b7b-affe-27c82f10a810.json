@@ -1,0 +1,53 @@
+{
+  "run_id": "5819e9e4-f241-4b7b-affe-27c82f10a810",
+  "started_at": 1769536289.3114777,
+  "ended_at": 1769536293.691332,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1769536289.311481,
+      "data": {
+        "mode": "explain",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan",
+      "ts": 1769536290.8913827,
+      "data": {
+        "steps": [
+          "parse",
+          "retrieve_context",
+          "explain"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1769536290.8914115,
+      "data": {
+        "index": 0,
+        "branches": 1,
+        "outputs": [
+          "decision"
+        ]
+      }
+    },
+    {
+      "name": "retrieve_context",
+      "ts": 1769536290.8918493,
+      "data": {
+        "context_chars": 0
+      }
+    },
+    {
+      "name": "explain",
+      "ts": 1769536293.6898196,
+      "data": {
+        "english_chars": 261
+      }
+    }
+  ],
+  "final_output": "**Summary**\n\nThis rule determines whether to approve or deny an application based on the applicant's age and income.\n\n**Decision Logic**\n\n* If the applicant is at least 18 years old and their annual income is less than $40,000, then **APPROVE** the application."
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MVEL Agent — Upload</title>
+    <style>
+      :root{--bg:#ffffff;--card:#ffffff;--accent:#000000;--muted:#666666;--border:#d1d5db}
+      html,body{height:100%}
+      body {
+        margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+        background:var(--bg);
+        color:#000000; display:flex; align-items:center; justify-content:center; padding:32px;
+      }
+      .container{width:900px; max-width:96%;}
+      .card{background:var(--card); border-radius:12px; padding:24px; box-shadow:0 6px 18px rgba(0,0,0,0.06); border:1px solid var(--border)}
+      h1{margin:0 0 8px;font-size:20px}
+      p.lead{margin:0 0 18px;color:var(--muted)}
+
+      .row{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+
+      .upload{
+        border:2px dashed var(--border); border-radius:8px; padding:22px; background:#fff; text-align:center; cursor:pointer; display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px
+      }
+      .upload input{display:none}
+      .filename{margin-top:10px;color:var(--muted); font-size:0.95rem}
+
+      .controls{display:flex;flex-direction:column;gap:12px}
+      label.field{font-size:0.85rem;color:var(--muted)}
+      select,input[type=text]{padding:10px;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box}
+
+      .modes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+      .mode-btn{padding:12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:#000;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:44px}
+      .mode-btn input{display:none}
+      .mode-btn.active{background:#000;color:#fff;border-color:transparent}
+
+      .footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+      button.primary{background:#000;color:#fff;padding:10px 18px;border-radius:8px;border:0;cursor:pointer;min-width:140px}
+      .hint{color:var(--muted);font-size:0.9rem}
+
+      @media (max-width:780px){.row{grid-template-columns:1fr}}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>MVEL Agent</h1>
+        <p class="lead">Upload an MVEL rule file and choose how you'd like it processed.</p>
+
+        <form id="form" action="/process" method="post" enctype="multipart/form-data">
+          <div class="row">
+            <div>
+              <label class="field">MVEL file</label>
+              <label class="upload" id="drop">
+                <div style="font-weight:600">Click or drop a file here</div>
+                <div class="filename" id="filename">No file chosen</div>
+                <input id="mvelfile" name="mvelfile" type="file" accept=".mvel,.txt" required />
+              </label>
+
+              <div style="margin-top:14px">
+                <label class="field">Mode</label>
+                <div class="modes" id="modes">
+                  <label class="mode-btn active"><input type="radio" name="mode" value="explain" checked>Explain</label>
+                  <label class="mode-btn"><input type="radio" name="mode" value="verify">Verify</label>
+                  <label class="mode-btn"><input type="radio" name="mode" value="tests">Tests</label>
+                  <label class="mode-btn"><input type="radio" name="mode" value="diff">Diff</label>
+                  <label class="mode-btn"><input type="radio" name="mode" value="agentic">Agentic</label>
+                  <label class="mode-btn"><input type="radio" name="mode" value="reflect">Reflect</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="controls">
+              <div>
+                <label class="field">Model (optional)</label>
+                <input id="model" name="model" type="text" value="llama3.1" />
+              </div>
+
+              <div>
+                <label class="field">Options</label>
+                <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="trace"> Write trace to runs/</label>
+              </div>
+
+              <div style="margin-top:auto"> 
+                <div class="hint">Try the sample: <strong>examples/rule.mvel</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <div class="hint">Files are processed locally by the server.</div>
+            <div>
+              <button class="primary" type="submit">Run</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // file preview + drag
+      const drop = document.getElementById('drop');
+      const fileInput = document.getElementById('mvelfile');
+      const filename = document.getElementById('filename');
+      const modes = document.getElementById('modes');
+
+      drop.addEventListener('click', ()=>fileInput.click());
+      fileInput.addEventListener('change', ()=>{
+        const f = fileInput.files[0];
+        filename.textContent = f ? f.name : 'No file chosen';
+      });
+
+      ;['dragenter','dragover','dragleave','drop'].forEach(ev=>{
+        drop.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();});
+      });
+      drop.addEventListener('drop', e=>{ if(e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event('change')); } });
+
+      // mode button toggle
+      modes.addEventListener('click', (e)=>{
+        const label = e.target.closest('.mode-btn');
+        if(!label) return;
+        modes.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+        label.classList.add('active');
+        label.querySelector('input').checked = true;
+      });
+    </script>
+  </body>
+</html>

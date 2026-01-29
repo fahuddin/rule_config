@@ -1,0 +1,53 @@
+{
+  "run_id": "550aed02-bcdc-474b-b808-79bca15496f3",
+  "started_at": 1769538883.1780007,
+  "ended_at": 1769538900.12329,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1769538883.1780047,
+      "data": {
+        "mode": "explain",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan",
+      "ts": 1769538893.4459708,
+      "data": {
+        "steps": [
+          "parse",
+          "retrieve_context",
+          "explain"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1769538893.446012,
+      "data": {
+        "index": 0,
+        "branches": 3,
+        "outputs": [
+          "decision"
+        ]
+      }
+    },
+    {
+      "name": "retrieve_context",
+      "ts": 1769538893.4466753,
+      "data": {
+        "context_chars": 0
+      }
+    },
+    {
+      "name": "explain",
+      "ts": 1769538900.1230845,
+      "data": {
+        "english_chars": 492
+      }
+    }
+  ],
+  "final_output": "**Summary**\n\nThis rule determines the outcome of a loan application based on the applicant's age, income, and whether they have a cosigner. The decision to approve, review, or deny the application is made by evaluating these factors.\n\n**Decision Logic**\n\n* If the applicant is at least 18 years old and their annual income is less than $40,000, then **APPROVE** the loan.\n* If the applicant has a cosigner, then **REVIEW** the loan to determine further action.\n* Otherwise, **DENY** the loan."
+}
