@@ -140,6 +140,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 cached = get_cached_explanation(rule_hash)
                 if cached:
                     trace.log_step("explain_cache_hit", {"rule_hash": rule_hash})
+                    trace.finish(cached)
+                    trace.write()
                     return cached
 
             english = explain_rule(llm, extractions[-1], context)
@@ -148,6 +150,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 set_cached_explanation(rule_hash, english)
 
             trace.log_step("explain", {"english_chars": len(english)})
+            trace.finish(english)
+            trace.write()
             return english
 
             
@@ -166,6 +170,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 english = rewrite_explanation(llm, extractions[-1], english, verdict.get("missing", []))
                 set_cached_explanation(rule_hash, english)
                 trace.log_step("rewrite", {"english_chars": len(english)})
+                trace.finish(english)
+                trace.write()
                 return english
             else:
                 trace.log_step("rewrite_skipped", {"ok": verdict.get("ok", True)})
@@ -175,6 +181,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 trace.log_step("reflect", {"issues": len(r.issues)})
                 save_memory_item({"type": "reflection_issue", "issues": r.issues})
                 r.issues = "".join(r.issues)
+                trace.finish(r.issues)
+                trace.write()
                 return r.issues
             
             except Exception:
