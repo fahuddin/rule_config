@@ -174,6 +174,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 r = reflect(llm, extractions[-1], english)
                 trace.log_step("reflect", {"issues": len(r.issues)})
                 save_memory_item({"type": "reflection_issue", "issues": r.issues})
+                r.issues = " ".join(r.issues)
+                return r.issues
             
             except Exception:
                 traceback.print_exc()
