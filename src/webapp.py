@@ -65,18 +65,71 @@ def generate_description():
         "Given the following rule definition, produce a short (1-2 sentence) user-facing description explaining the purpose and effect of the rule:\n\n"
         f"Definition: {definition}\n\nDescription:")
 
-    def _clean_text(text: str) -> str:
+    def _clean_text(text: str, definition: str) -> str:
+        """Clean generated text by removing assistant lead-ins, extraneous characters,
+        and sentences that simply restate the provided definition.
+        """
         if not text:
             return ''
         t = text.strip()
-        # remove common assistant lead-ins like "Here is..." or "Here is a 1-2 sentence..."
+        # remove common assistant lead-ins like "Here is..." or "Here's..."
         t = re.sub(r"^\s*(Here is(?: a)?(?: .*?)?:|Here\'s:?|Here you go:?|Here you are:?|Assistant:|Response:)\s*\n*", '', t, flags=re.I)
         # remove any leading label line that ends with ':'
         t = re.sub(r"^.*?:\s*\n+", '', t, count=1)
-        # strip surrounding quotes
-        if (t.startswith('"') and t.endswith('"')) or (t.startswith("'") and t.endswith("'")):
-            t = t[1:-1].strip()
-        return t
+        # normalize whitespace and remove control chars
+        t = re.sub(r"[\x00-\x1f\x7f]+", ' ', t)
+        t = re.sub(r"\s+", ' ', t).strip()
+
+        # split into sentences (simple heuristic) include : and ; as sentence boundaries
+        sentences = re.split(r'(?<=[\.!?;:])\s+', t)
+
+        def word_set(s: str):
+            return set([w for w in re.findall(r"\w+", s.lower())])
+
+        def is_restatement(s: str) -> bool:
+            # skip very short fragments
+            if len(s.strip()) < 10:
+                return True
+            # common starter phrases that often repeat the rule
+            if re.match(r"^\s*(the rule|this rule|it checks|it validates|it ensures|it verifies|ensures|verifies|validates|checks)\b", s.strip(), flags=re.I):
+                return True
+            # markers that indicate paraphrase/alternate phrasing
+            if re.search(r"\balternatively\b|\balso\b|\bin summary\b|\bfor example\b", s, flags=re.I):
+                return True
+            # high overlap with definition
+            def_words = word_set(definition)
+            sent_words = word_set(s)
+            if not def_words or not sent_words:
+                return False
+            overlap = len(def_words & sent_words) / max(1, len(def_words))
+            # also consider proportion relative to sentence length
+            overlap_sent = len(def_words & sent_words) / max(1, len(sent_words))
+            if overlap > 0.45 or overlap_sent > 0.45:
+                return True
+            # heuristic: phrases that indicate a validation restatement
+            if 'validation' in s.lower() and 'account' in s.lower():
+                return True
+            return False
+
+        kept = []
+        for s in sentences:
+            if not s or is_restatement(s):
+                continue
+            kept.append(s.strip())
+
+        out = ' '.join(kept).strip()
+        # if aggressive filtering removed everything, fall back to the cleaned original text
+        if not out:
+            out = t
+        # remove quotation characters (straight and smart quotes)
+        out = out.strip()
+        out = out.replace('"', '').replace("'", '')
+        out = out.replace('“', '').replace('”', '').replace('‘', '').replace('’', '')
+        out = out.replace('«', '').replace('»', '')
+        # final cleanup: remove repeated newlines and normalize whitespace
+        out = re.sub(r"[\r\n]+", ' ', out)
+        out = re.sub(r"\s+", ' ', out).strip()
+        return out
 
     # cache key based on normalized definition and model
     key = hashlib.sha256((definition + '||' + model).encode('utf-8')).hexdigest()
@@ -110,7 +163,7 @@ def generate_description():
         logging.exception('LLM generation failed')
         text = ''
 
-    cleaned = _clean_text(text)
+    cleaned = _clean_text(text, definition)
     # store in cache
     try:
         with _cache_lock:
