@@ -111,5 +111,6 @@ def format_context_from_memory(mem: Dict[str, Any]) -> str:
     if issues:
         for issue in issues:
             parts.append(issue)
-
-    return "\n".join(parts).strip()
+    result = " ".join(str(p) for p in parts)
+    print(result)
+    return result

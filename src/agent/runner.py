@@ -40,32 +40,32 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     mem = load_memory() #load user settings and domain mapping and reflection
     mem_context = format_context_from_memory(mem) 
     
-    r = MiniRedis(host="127.0.0.1", port=6379)
+    redis_client = MiniRedis(host="127.0.0.1", port=6379)
 
     def hash_text(text: str) -> str:
         return sha256(text.encode("utf-8")).hexdigest()
     
     def get_cached_explanation(rule_hash: str) -> str | None:
         key = f"mvel:cache:explain:{rule_hash}"
-        raw = r.get(key)
+        raw = redis_client.get(key)
         if raw is None:
             return None
         return raw.decode("utf-8")
     
     def get_cached_parse(rule_hash: str) -> dict | None:
         key = f"mvel:cache:parse:{rule_hash}"
-        raw = r.get(key)
+        raw = redis_client.get(key)
         if raw is None:
             return None
         return json.loads(raw.decode("utf-8"))
     
     def set_cached_parse(rule_hash: str, parsed: dict, ttl_seconds: int = 7 * 24 * 3600) -> None:
         key = f"mvel:cache:parse:{rule_hash}"
-        r.setex(key, ttl_seconds, json.dumps(parsed))
+        redis_client.setex(key, ttl_seconds, json.dumps(parsed))
         
     def set_cached_explanation(rule_hash: str, explanation: str, ttl_seconds: int = 24 * 3600) -> None:
         key = f"mvel:cache:explain:{rule_hash}"
-        r.setex(key, ttl_seconds, explanation)
+        redis_client.setex(key, ttl_seconds, explanation)
     
 
     trace = Trace(enabled=enable_trace)
@@ -140,9 +140,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 cached = get_cached_explanation(rule_hash)
                 if cached:
                     trace.log_step("explain_cache_hit", {"rule_hash": rule_hash})
-                    trace.finish(cached)
-                    trace.write()
-                    return cached
+                    # use cached explanation but continue pipeline so downstream steps can run
+                    english = cached
 
             english = explain_rule(llm, extractions[-1], context)
 
@@ -150,9 +149,6 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 set_cached_explanation(rule_hash, english)
 
             trace.log_step("explain", {"english_chars": len(english)})
-            trace.finish(english)
-            trace.write()
-            return english
 
             
 
@@ -170,21 +166,13 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 english = rewrite_explanation(llm, extractions[-1], english, verdict.get("missing", []))
                 set_cached_explanation(rule_hash, english)
                 trace.log_step("rewrite", {"english_chars": len(english)})
-                trace.finish(english)
-                trace.write()
-                return english
             else:
                 trace.log_step("rewrite_skipped", {"ok": verdict.get("ok", True)})
         elif step == "reflect":
             try:
-                r = reflect(llm, extractions[-1], english)
-                trace.log_step("reflect", {"issues": len(r.issues)})
-                save_memory_item({"type": "reflection_issue", "issues": r.issues})
-                r.issues = "".join(r.issues)
-                trace.finish(r.issues)
-                trace.write()
-                return r.issues
-            
+                refl = reflect(llm, extractions[-1], english)
+                trace.log_step("reflect", {"issues": len(refl.issues)})
+                save_memory_item({"type": "reflection_issue", "issues": refl.issues})
             except Exception:
                 traceback.print_exc()
         elif step == "generate_tests":

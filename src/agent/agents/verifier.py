@@ -17,18 +17,41 @@ def verify_explanation(llm, extraction: dict, english: str) -> Dict[str, Any]:
     chain = VERIFY_PROMPT | llm | StrOutputParser()
     extraction_json = json.dumps(extraction, ensure_ascii=False, indent=2)
     raw = chain.invoke({"extraction_json": extraction_json, "english": english})
+    print(raw)
     verdict = _parse_json_only(raw)
     # normalize keys
     verdict.setdefault("ok", True)
     verdict.setdefault("missing", [])
+    # Ensure missing entries are strings (LLM may return structured items)
+    cleaned_missing = []
+    for m in verdict.get("missing", []):
+        if isinstance(m, str):
+            cleaned_missing.append(m)
+        else:
+            try:
+                cleaned_missing.append(json.dumps(m, ensure_ascii=False))
+            except Exception:
+                cleaned_missing.append(str(m))
+    verdict["missing"] = cleaned_missing
     verdict.setdefault("rewrite_needed", verdict.get("ok") is False)
     return verdict
 
 def rewrite_explanation(llm, extraction: dict, english: str, missing: List[str]) -> str:
     chain = REWRITE_PROMPT | llm | StrOutputParser()
     extraction_json = json.dumps(extraction, ensure_ascii=False, indent=2)
+    # Ensure missing list elements are strings
+    missing_parts = []
+    for m in missing or []:
+        if isinstance(m, str):
+            missing_parts.append(m)
+        else:
+            try:
+                missing_parts.append(json.dumps(m, ensure_ascii=False))
+            except Exception:
+                missing_parts.append(str(m))
+
     return chain.invoke({
         "extraction_json": extraction_json,
         "english": english,
-        "missing": "\n".join(missing) if missing else "(none)"
+        "missing": "\n".join(missing_parts) if missing_parts else "(none)"
     }).strip()

@@ -1,0 +1,84 @@
+{
+  "run_id": "0ee50106-1636-4e0a-8855-12fac5ae201d",
+  "started_at": 1769800791.1036694,
+  "ended_at": 1769800805.7460532,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1769800791.1036747,
+      "data": {
+        "mode": "verify",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan",
+      "ts": 1769800794.8393931,
+      "data": {
+        "steps": [
+          "parse",
+          "static_checks",
+          "retrieve_context",
+          "reflect",
+          "verify",
+          "rewrite"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1769800794.845383,
+      "data": {
+        "index": 0,
+        "branches": 2,
+        "outputs": [
+          "MVELoutput"
+        ]
+      }
+    },
+    {
+      "name": "static_checks",
+      "ts": 1769800794.845402,
+      "data": {
+        "issues": [
+          "No DEFAULT/else branch found; rule may be partial or relies on fallthrough.",
+          "Branch 1 has no actions."
+        ]
+      }
+    },
+    {
+      "name": "retrieve_context",
+      "ts": 1769800794.8468473,
+      "data": {
+        "context_chars": 2064
+      }
+    },
+    {
+      "name": "reflect",
+      "ts": 1769800805.7445686,
+      "data": {
+        "issues": 3
+      }
+    },
+    {
+      "name": "verify",
+      "ts": 1769800805.74584,
+      "data": {
+        "ok": false,
+        "missing": [
+          "verify: missing extraction or english"
+        ],
+        "rewrite_needed": true
+      }
+    },
+    {
+      "name": "rewrite_skipped",
+      "ts": 1769800805.7458432,
+      "data": {
+        "ok": false
+      }
+    }
+  ],
+  "final_output": "No output was produced. Check the plan and earlier steps."
+}

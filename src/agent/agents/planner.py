@@ -35,7 +35,7 @@ def plan_steps(llm, mode: str) -> List[str]:
         return ["parse", "reflect"]
     if mode == "verify":
         logging.debug("Check mode", steps)
-        return ["parse", "static_checks", "retrieve_context", "reflect", "verify", "rewrite"]
+        return ["parse", "static_checks", "retrieve_context", "explain", "reflect", "verify", "rewrite"]
     if mode == "explain":
         logging.debug("Reached explain", steps)
         return ["parse", "retrieve_context", "explain", "reflect", "rewrite"]
