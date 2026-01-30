@@ -36,6 +36,7 @@ class Trace:
             "final_output": self.final_output,
         }
         path = os.path.join(RUNS_DIR, f"run_{self.run_id}.json")
+        print(path)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)
             print(payload)
