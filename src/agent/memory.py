@@ -6,24 +6,22 @@ from typing import Any, Dict
 MEM_DIR = "memory"
 USER_PROFILE = os.path.join(MEM_DIR, "user_profile.json")
 MAPPINGS = os.path.join(MEM_DIR, "mappings.json")
-MEM_PATH = os.path.join(os.path.dirname(__file__), "..", "memory.json")
+REFLECT = os.path.join(os.path.dirname(__file__), "..", "memory.json")
 
 
 def save_memory_item(item: Dict[str, Any]) -> None:
-    os.makedirs(os.path.dirname(MEM_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(REFLECT), exist_ok=True)
     data = []
-    print(MEM_PATH)
-    if os.path.isfile(MEM_PATH):
+    if os.path.isfile(REFLECT):
         try:
-            with open(MEM_PATH, "r", encoding="utf-8") as f:
+            with open(REFLECT, "r", encoding="utf-8") as f:
                 data = json.load(f) or []
         except Exception:
             data = []
     data.append(item)
-    with open(MEM_PATH, "w", encoding="utf-8") as f:
+    with open(REFLECT, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
         
-
 
 def _read_json(path: str, default: Any) -> Any:
     """
@@ -63,10 +61,14 @@ def load_memory() -> Dict[str, Any]:
             "field_definitions": {},
         },
     )
+    
+    # `memory.json` is append-style (list of entries). Read as list.
+    reflect = _read_json(REFLECT, [])
 
     return {
         "profile": profile,
         "mappings": mappings,
+        "reflect": reflect
     }
 
 
@@ -76,8 +78,23 @@ def format_context_from_memory(mem: Dict[str, Any]) -> str:
     into LLM prompts as context.
     """
     mappings = mem.get("mappings", {})
+    self_refl = mem.get("reflect", [])
     output_labels = mappings.get("output_labels", {})
     field_definitions = mappings.get("field_definitions", {})
+    # Aggregate issues from reflect entries. Support dict or list formats.
+    issues = []
+    if isinstance(self_refl, dict):
+        issues = self_refl.get("issues", []) or []
+    elif isinstance(self_refl, list):
+        for entry in self_refl:
+            if not isinstance(entry, dict):
+                continue
+            entry_issues = entry.get("issues", [])
+            if isinstance(entry_issues, list):
+                issues.extend(entry_issues)
+            elif entry_issues:
+                issues.append(entry_issues)
+    
 
     parts = []
 
@@ -90,5 +107,9 @@ def format_context_from_memory(mem: Dict[str, Any]) -> str:
         parts.append("Output label meanings:")
         for label, meaning in output_labels.items():
             parts.append(f"- {label}: {meaning}")
+            
+    if issues:
+        for issue in issues:
+            parts.append(issue)
 
     return "\n".join(parts).strip()
