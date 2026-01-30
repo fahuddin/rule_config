@@ -37,8 +37,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     """
     # 1) Initialize shared resources
     llm = get_llm(model=model, temperature=0.0)  # deterministic
-    mem = load_memory() #load user settings and domain mapping 
-    mem_context = format_context_from_memory(mem)  
+    mem = load_memory() #load user settings and domain mapping and reflection
+    mem_context = format_context_from_memory(mem) 
     
     r = MiniRedis(host="127.0.0.1", port=6379)
 
@@ -97,8 +97,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
             # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
-                set_cached_parse(rule_hash, extraction)
-
+                parsed = extraction
+                set_cached_parse(rule_hash, parsed)
             extractions.append(parsed)
             
             trace.log_step("parse", {
@@ -174,6 +174,8 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 r = reflect(llm, extractions[-1], english)
                 trace.log_step("reflect", {"issues": len(r.issues)})
                 save_memory_item({"type": "reflection_issue", "issues": r.issues})
+                r.issues = "".join(r.issues)
+                return r.issues
             
             except Exception:
                 traceback.print_exc()

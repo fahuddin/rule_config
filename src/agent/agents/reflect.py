@@ -17,7 +17,7 @@ def reflect(llm, extraction: dict, english: str) -> AgentResult:
     if s != -1 and e != -1 and e > s:
         raw = raw[s:e+1]
     obj = json.loads(raw)
-    logging.DEBUG("REFLECT:", obj)
+    logging.debug("REFLECT: %r", obj)
     
 
     return AgentResult(

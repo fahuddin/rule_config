@@ -29,6 +29,8 @@ def plan_steps(llm, mode: str) -> List[str]:
         return ["parse", "parse", "diff"]
     if mode == "tests":
         return ["parse", "generate_tests"]
+    if mode == "reflect":
+        return ["parse", "reflect"]
     if mode == "verify":
         logging.debug("Check mode", steps)
         return ["parse", "static_checks", "retrieve_context", "reflect", "verify", "rewrite"]
