@@ -72,7 +72,7 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     trace.log_step("start", {"mode": mode, "model": model, "inputs": len(mvel_texts)})
 
     # 2) Ask planner for the execution plan
-    steps = plan_steps(llm, mode)
+    steps = plan_steps(mode)
     trace.log_step("plan", {"steps": steps})
 
     # 3) Shared working state (short-term memory for this run)

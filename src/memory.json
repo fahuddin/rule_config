@@ -144,5 +144,44 @@
     "issues": [
       "The English explanation does not fully match the rule extraction. Specifically, the 'branches' section in the rule extraction contains two separate conditions for checking data[3] and data[2], but the English explanation combines these into a single condition."
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. Specifically, the 'branches' section in the rule extraction contains two separate conditions, but the English explanation only mentions one condition for each branch."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "The rule extraction does not fully match the English explanation.",
+        "details": [
+          "In the rule extraction, there is no 'DEFAULT' branch mentioned in the branches section."
+        ]
+      },
+      {
+        "code": "MISMATCH",
+        "message": "The condition for the second branch in the rule extraction is incomplete.",
+        "details": [
+          "The English explanation mentions `stringhelper.isEmpty(data[3])` as the condition, but the rule extraction has `stringhelper.isEmpty(data[2]))`."
+        ]
+      },
+      {
+        "code": "MISMATCH",
+        "message": "The actions for the 'DEFAULT' branch in the English explanation do not match the rule extraction.",
+        "details": [
+          "In the English explanation, it is mentioned that the flag to terminate further rule execution should be set twice, but in the rule extraction, it is only set once."
+        ]
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. The rule extraction contains a condition '!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2]))' which is not mentioned in the English explanation.",
+      "The English explanation mentions a 'DEFAULT branch', but the rule extraction only has two branches: one with a condition and actions, and another without any actions. There is no default branch."
+    ]
   }
 ]

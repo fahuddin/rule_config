@@ -17,22 +17,13 @@ def _parse_json_only(text: str) -> dict:
         return json.loads(text[s:e+1])
     raise ValueError("Planner did not return valid JSON.")
 
-def plan_steps(llm, mode: str) -> List[str]:
-    chain = PLANNER_PROMPT | llm | StrOutputParser()
-    raw = chain.invoke({"mode": mode})
-    obj = _parse_json_only(raw)
-    logging.debug("Check obj", obj)
-    steps = obj.get("steps", [])
-    logging.debug("Check steps", steps)
-    logging.debug("Check mode", mode)
+def plan_steps(mode: str) -> List[str]:
     if mode == "diff":
         return ["parse", "parse", "diff"]
     if mode == "tests":
         return ["parse", "generate_tests"]
     if mode == "verify":
-        logging.debug("Check mode", steps)
         return ["parse", "static_checks", "retrieve_context", "explain", "reflect", "verify", "rewrite"]
     if mode == "explain":
-        logging.debug("Reached explain", steps)
         return ["parse", "retrieve_context", "explain", "reflect", "rewrite"]
     return ["parse", "static_checks", "retrieve_context", "explain", "verify", "rewrite"]
