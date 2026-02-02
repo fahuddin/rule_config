@@ -97,8 +97,7 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
             # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
-                parsed = extraction
-                set_cached_parse(rule_hash, parsed)
+                set_cached_parse(rule_hash, extraction)
             extractions.append(parsed)
             
             trace.log_step("parse", {
