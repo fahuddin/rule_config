@@ -12,12 +12,14 @@ class Trace:
         self.run_id = str(uuid.uuid4())
         self.started_at = time.time()
         self.steps: List[Dict[str, Any]] = []
+        self.cache_hit: bool = False
         self.final_output: Optional[str] = None
 
-    def log_step(self, name: str, data: Dict[str, Any]):
+    def log_step(self, name: str, data: Dict[str, Any], cache_hit: bool):
         self.steps.append({
             "name": name,
             "ts": time.time(),
+            "cache_hit": bool,
             "data": data
         })
 
@@ -33,6 +35,7 @@ class Trace:
             "started_at": self.started_at,
             "ended_at": time.time(),
             "steps": self.steps,
+            "cache_hit": self.cache_hit,
             "final_output": self.final_output,
         }
         path = os.path.join(RUNS_DIR, f"run_{self.run_id}.json")

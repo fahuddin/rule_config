@@ -66,6 +66,17 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     def set_cached_explanation(rule_hash: str, explanation: str, ttl_seconds: int = 24 * 3600) -> None:
         key = f"mvel:cache:explain:{rule_hash}"
         redis_client.setex(key, ttl_seconds, explanation)
+        
+    def get_cached_context(rule_hash: str) -> str | None:
+        key = f"mvel:cache:context:{rule_hash}"
+        raw = redis_client.get(key)
+        if raw is None:
+            return None
+        return raw.decode("utf-8")
+
+    def set_cached_context(rule_hash: str, ctx: str, ttl_seconds: int) -> None:
+        key = f"mvel:cache:context:{rule_hash}"
+        redis_client.setex(key, ttl_seconds, ctx)
     
 
     trace = Trace(enabled=enable_trace)
@@ -92,19 +103,21 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 continue
 
             rule_hash = hash_text(mvel_texts[idx])
-            extraction = parse_mvel_branches(mvel_texts[idx])
-
-            # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
-                parsed = extraction
+                parsed = parse_mvel_branches(mvel_texts[idx])
                 set_cached_parse(rule_hash, parsed)
+                cache_hit = False
+            else:
+                cache_hit = True
+                
             extractions.append(parsed)
             
             trace.log_step("parse", {
                 "index": idx,
-                "branches": len(extraction.get("branches", [])),
-                "outputs": extraction.get("outputs", []),
+                "branches": len(parsed.get("branches", [])),
+                "outputs": parsed.get("outputs", []),
+                "cache_hit": cache_hit
             })
 
         elif step == "static_checks":
@@ -118,6 +131,11 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
         elif step == "retrieve_context":
             # Simple RAG + memory context
             # Uses first MVEL text as query signal (good enough for POC)
+            if rule_hash:
+                cached = get_cached_context(rule_hash)
+                trace.log_step("retrieve_context_cache_hit", {"context_chars": len(context)})
+                continue
+                
             rag = retrieve_context(mvel_texts[0] if mvel_texts else "", kb_dir="dir")
             pieces = []
             if mem_context:
@@ -133,15 +151,15 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
         elif step == "explain":
             if not extractions:
                 english = "could not parse any rule branches from the provided MVEL."
-                trace.log_step("explain_fallback", {"reason": "no extraction"})
                 continue
 
             if rule_hash:
                 cached = get_cached_explanation(rule_hash)
                 if cached:
-                    trace.log_step("explain_cache_hit", {"rule_hash": rule_hash})
                     # use cached explanation but continue pipeline so downstream steps can run
                     english = cached
+                    trace.log_step("explain_cache_hit", {"rule_hash": rule_hash})
+                    continue 
 
             english = explain_rule(llm, extractions[-1], context)
 
