@@ -226,6 +226,22 @@ def generate_description():
 
     return jsonify({'description': cleaned}), 200
 
+@app.route("/api/rules/<rule_id>/description", methods=["POST"])
+def api_save_description(rule_id):
+    data = request.get_json(force=True) or {}
+    desc = (data.get("description") or "").strip()
+    if not desc:
+        return jsonify({"error": "description required"}), 400
+
+    key = f"rule:{rule_id}"
+    if not rdb.exists(key):
+        return jsonify({"error": "rule not found"}), 404
+
+            # store as a new field (rule_desc)
+    rdb.hset(key, "rule_desc", desc)
+    return jsonify({"ok": True, "rule_id": rule_id, "rule_desc": desc})
+                
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
