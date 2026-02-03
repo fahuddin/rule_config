@@ -121,6 +121,32 @@ REWRITE_PROMPT = ChatPromptTemplate.from_messages([
 ])
 
 
+ENGLISH_TO_MVEL_PROMPT = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        "You are an expert rule engineer who writes correct, minimal MVEL rules. "
+        "Convert plain-English business requirements into MVEL using the provided context. "
+        "Be precise: do not invent fields, functions, or objects not present in the context."
+    ),
+    (
+        "user",
+        "Convert the English requirement into an MVEL rule.\n\n"
+        "Requirements:\n"
+        "- Use ONLY variables/objects/functions listed in Context\n"
+        "- Implement ALL conditions and ALL outcomes described\n"
+        "- Prefer clear boolean conditions; avoid unnecessary complexity\n"
+        "- Do not add new validations not stated\n"
+        "- If any required data is missing from Context, write an explicit assumption in 'assumptions'\n"
+        "- Output MUST be valid JSON with keys: mvel, assumptions, notes\n\n"
+        "Context (available facts/objects/helpers):\n"
+        "{context_json}\n\n"
+        "English requirement:\n"
+        "{english}\n\n"
+        "Output JSON:"
+    )
+])
+
+
 # -------------------------
 # DIFF PROMPT
 # -------------------------

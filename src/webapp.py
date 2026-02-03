@@ -56,7 +56,7 @@ def _get_all_rules() -> list[dict]:
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return render_template('rule_config.html')
 
 @app.route("/api/rules", methods=["GET"])
 def api_rules():
@@ -71,29 +71,6 @@ def api_rule(rule_id):
         return jsonify({"error": "not found"}), 404
     return jsonify(rule)
 
-@app.route('/rule-config', methods=['GET'])
-def rule_config():
-    return render_template('rule_config.html')
-
-@app.route('/process', methods=['POST'])
-def process():
-    mode = request.form.get('mode', 'explain')
-    model = request.form.get('model', 'llama3.1')
-    trace = bool(request.form.get('trace'))
-
-    uploaded = request.files.get('mvelfile')
-    if not uploaded or uploaded.filename == '':
-        return redirect(url_for('index'))
-
-    text = uploaded.read().decode('utf-8', errors='replace')
-
-    try:
-        result = run(mode=mode, mvel_texts=[text], model=model, enable_trace=trace)
-    except Exception as e:
-        result = f"Error running agent: {e}"
-
-    return render_template('result.html', mode=mode, filename=uploaded.filename, output=result)
-
 
 
 # API: generate a short user-facing description from a rule definition using the local LLM
@@ -102,127 +79,25 @@ def generate_description():
     data = request.get_json(force=True) or {}
     definition = data.get('definition', '')
     model = data.get('model', 'llama3.1')
-    force = bool(data.get('force', False))
-
+    mode = data.get('mode', 'explain')
+    trace = bool(request.form.get('trace', True))
+  #  force = bool(data.get('force', False))
+    
     if not definition:
         return jsonify({'description': ''}), 200
-
-    prompt = (
-    "You are an expert at translating rule logic into plain English for non-technical users. "
-    "Given the following MVEL rule definition, write a clear, concise description (1–2 sentences) "
-    "that explains what the rule checks and what happens when it matches. "
-    "Avoid code syntax, variable names, and implementation details. "
-    "Focus on the business meaning and outcome.\n\n"
-    f"MVEL Rule:\n{definition}\n\n"
-    "Plain-English Description:")
-
-    def _clean_text(text: str, definition: str) -> str:
-        """Clean generated text by removing assistant lead-ins, extraneous characters,
-        and sentences that simply restate the provided definition.
-        """
-        if not text:
-            return ''
-        t = text.strip()
-        # remove common assistant lead-ins like "Here is..." or "Here's..."
-        t = re.sub(r"^\s*(Here is(?: a)?(?: .*?)?:|Here\'s:?|Here you go:?|Here you are:?|Assistant:|Response:)\s*\n*", '', t, flags=re.I)
-        # remove any leading label line that ends with ':'
-        t = re.sub(r"^.*?:\s*\n+", '', t, count=1)
-        # normalize whitespace and remove control chars
-        t = re.sub(r"[\x00-\x1f\x7f]+", ' ', t)
-        t = re.sub(r"\s+", ' ', t).strip()
-
-        # split into sentences (simple heuristic) include : and ; as sentence boundaries
-        sentences = re.split(r'(?<=[\.!?;:])\s+', t)
-
-        def word_set(s: str):
-            return set([w for w in re.findall(r"\w+", s.lower())])
-
-        def is_restatement(s: str) -> bool:
-            # skip very short fragments
-            if len(s.strip()) < 10:
-                return True
-            # common starter phrases that often repeat the rule
-            if re.match(r"^\s*(the rule|this rule|it checks|it validates|it ensures|it verifies|ensures|verifies|validates|checks)\b", s.strip(), flags=re.I):
-                return True
-            # markers that indicate paraphrase/alternate phrasing
-            if re.search(r"\balternatively\b|\balso\b|\bin summary\b|\bfor example\b", s, flags=re.I):
-                return True
-            # high overlap with definition
-            def_words = word_set(definition)
-            sent_words = word_set(s)
-            if not def_words or not sent_words:
-                return False
-            overlap = len(def_words & sent_words) / max(1, len(def_words))
-            # also consider proportion relative to sentence length
-            overlap_sent = len(def_words & sent_words) / max(1, len(sent_words))
-            if overlap > 0.45 or overlap_sent > 0.45:
-                return True
-            # heuristic: phrases that indicate a validation restatement
-            if 'validation' in s.lower() and 'account' in s.lower():
-                return True
-            return False
-
-        kept = []
-        for s in sentences:
-            if not s or is_restatement(s):
-                continue
-            kept.append(s.strip())
-
-        out = ' '.join(kept).strip()
-        # if aggressive filtering removed everything, fall back to the cleaned original text
-        if not out:
-            out = t
-        # remove quotation characters (straight and smart quotes)
-        out = out.strip()
-        out = out.replace('"', '').replace("'", '')
-        out = out.replace('“', '').replace('”', '').replace('‘', '').replace('’', '')
-        out = out.replace('«', '').replace('»', '')
-        # final cleanup: remove repeated newlines and normalize whitespace
-        out = re.sub(r"[\r\n]+", ' ', out)
-        out = re.sub(r"\s+", ' ', out).strip()
-        return out
+    try:
+        result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=trace)
+    except Exception as e:
+        result = f"Error running agent: {e}"
+    
+    
 
     # cache key based on normalized definition and model
-    key = hashlib.sha256((definition + '||' + model).encode('utf-8')).hexdigest()
-    # check cache unless force=true
-    if not force:
-        with _cache_lock:
-            entry = _desc_cache.get(key)
-            if entry:
-                desc, ts = entry
-                if time.time() - ts < CACHE_TTL:
-                    return jsonify({'description': desc}), 200
-                else:
-                    del _desc_cache[key]
-
-    try:
-        llm = get_llm(model=model, temperature=0.0)
-        # Use HumanMessage to call chat-style generate
-        res = llm.generate([[HumanMessage(content=prompt)]])
-        text = ''
-        gens = getattr(res, 'generations', None)
-        if gens and len(gens) and len(gens[0]):
-            gen0 = gens[0][0]
-            # prefer plain text, then message.content
-            if hasattr(gen0, 'text') and gen0.text:
-                text = gen0.text
-            elif hasattr(gen0, 'message') and getattr(gen0.message, 'content', None):
-                text = gen0.message.content
-            else:
-                text = str(gen0)
-    except Exception as e:
-        logging.exception('LLM generation failed')
-        text = ''
-
-    cleaned = _clean_text(text, definition)
+     # cache key based on normalized definition and model
     # store in cache
-    try:
-        with _cache_lock:
-            _desc_cache[key] = (cleaned, time.time())
-    except Exception:
-        logging.exception('Failed to write cache')
 
-    return jsonify({'description': cleaned}), 200
+    return jsonify({'description': result}), 200
+
 
 @app.route("/api/rules/<rule_id>/description", methods=["POST"])
 def api_save_description(rule_id):

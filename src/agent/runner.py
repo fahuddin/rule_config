@@ -16,6 +16,7 @@ from agent.agents.explainer import explain_rule
 from agent.agents.verifier import verify_explanation, rewrite_explanation
 from agent.agents.diff import diff_rules
 from agent.agents.tests import generate_tests
+from agent.agents.translate import generate_mvel
 from hashlib import sha256
 from agent.agents.redis_mini import MiniRedis
 import traceback
@@ -85,6 +86,10 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     # 4) Execute the plan
     rule_hash: str | None = None
     for step in steps:
+        if step == "translate":
+            english = mvel_texts
+            mvel = generate_mvel(english)
+            return mvel
         if step == "parse":
             idx = len(extractions)
             if idx >= len(mvel_texts):
