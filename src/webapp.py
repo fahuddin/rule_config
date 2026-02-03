@@ -14,6 +14,7 @@ import redis
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB upload limit
 
+#redis config
 REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
 REDIS_DB   = int(os.environ.get("REDIS_DB", "0"))
@@ -28,9 +29,6 @@ _cache_lock = Lock()
 CACHE_TTL = 24 * 3600
 
 def list_rule_id():
-    ids = rdb.smembers("rule:all")
-    if ids:
-        return sorted(ids, key=lambda x: int(x))
     found = []
     for key in rdb.scan_iter(match="rule:*", count=500):
         if key in ("rule:id", "rule:all"):
