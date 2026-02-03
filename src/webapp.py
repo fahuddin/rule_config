@@ -9,20 +9,69 @@ import hashlib
 import time
 import re
 from threading import Lock
+import redis
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB upload limit
 
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", "6379"))
+REDIS_DB   = int(os.environ.get("REDIS_DB", "0"))
+
+rdb = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+
+RULE_FIELDS = ["rule_id", "application", "sub_module", "rule_type", "rule_name", "rule_def", "rule_desc"]
 # Simple in-memory cache: key -> (description, timestamp)
 _desc_cache = {}
 _cache_lock = Lock()
 # TTL for cache entries (seconds)
 CACHE_TTL = 24 * 3600
 
+def list_rule_id():
+    ids = rdb.smembers("rule:all")
+    if ids:
+        return sorted(ids, key=lambda x: int(x))
+    found = []
+    for key in rdb.scan_iter(match="rule:*", count=500):
+        if key in ("rule:id", "rule:all"):
+            continue
+        if key.startswith("rule:"):
+            rid = key.split(":", 1)[1]
+            if rid.isdigit():
+                found.append(rid)
+    return sorted(set(found), key=lambda x: int(x))
+
+def _get_rule(rule_id: str) -> dict:
+    d = rdb.hgetall(f"rule:{rule_id}") or {}
+    # normalize: ensure all expected fields exist
+    for f in RULE_FIELDS:
+        d.setdefault(f, "")
+    # ensure rule_id is present
+    if not d["rule_id"]:
+        d["rule_id"] = str(rule_id)
+    return d
+
+
+def _get_all_rules() -> list[dict]:
+    ids = list_rule_id()
+    return [_get_rule(rid) for rid in ids]
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
+@app.route("/api/rules", methods=["GET"])
+def api_rules():
+    rules = _get_all_rules()
+    return jsonify({"count": len(rules), "rules": rules})
+
+
+@app.route("/api/rules/<rule_id>", methods=["GET"])
+def api_rule(rule_id):
+    rule = _get_rule(rule_id)
+    if not rule or (not rdb.exists(f"rule:{rule_id}")):
+        return jsonify({"error": "not found"}), 404
+    return jsonify(rule)
 
 @app.route('/rule-config', methods=['GET'])
 def rule_config():
@@ -61,9 +110,13 @@ def generate_description():
         return jsonify({'description': ''}), 200
 
     prompt = (
-        "You are a concise rule documentation assistant. "
-        "Given the following rule definition, produce a short (1-2 sentence) user-facing description explaining the purpose and effect of the rule:\n\n"
-        f"Definition: {definition}\n\nDescription:")
+    "You are an expert at translating rule logic into plain English for non-technical users. "
+    "Given the following MVEL rule definition, write a clear, concise description (1–2 sentences) "
+    "that explains what the rule checks and what happens when it matches. "
+    "Avoid code syntax, variable names, and implementation details. "
+    "Focus on the business meaning and outcome.\n\n"
+    f"MVEL Rule:\n{definition}\n\n"
+    "Plain-English Description:")
 
     def _clean_text(text: str, definition: str) -> str:
         """Clean generated text by removing assistant lead-ins, extraneous characters,

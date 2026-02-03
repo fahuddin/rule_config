@@ -201,5 +201,40 @@
       "The English explanation does not mention the 'stringhelper.isEmpty(data[2])' condition in the second branch.",
       "The English explanation incorrectly states that the 'Otherwise' branch includes multiple conditions and actions, whereas the rule extraction shows only one action ('output.setRuleExec(false)') for this branch."
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. The rule extraction has two branches with different conditions, but the English explanation only mentions three conditions.",
+      "The first condition in the English explanation is 'If the input data is null or has a length of 3 or less', which corresponds to the first branch in the rule extraction. However, the second and third conditions mentioned in the English explanation do not match any branches in the rule extraction.",
+      "The rule extraction also mentions '!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2])' as a condition, but this is not mentioned in the English explanation."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. The rule extraction has a 'DEFAULT' branch with two conditions and actions, but the English explanation only mentions one condition and action for this branch."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction: The condition 'data != null && (!stringhelper.isEmpty(data[3])' in the rule extraction has a closing parenthesis at the end, which is missing in the English explanation.",
+      "The English explanation does not fully match the rule extraction: The action 'output.getValidContextSetting().setTerminateFurther(true)' in the rule extraction is missing in the English explanation.",
+      "The English explanation does not fully match the rule extraction: The variable 'getCurrExecMoney' in the rule extraction has a different name than mentioned in the English explanation ('CurrExecMoney').",
+      "The English explanation does not fully match the rule extraction: The action 'output.setRuleExec(false)' in the DEFAULT branch of the rule extraction is missing in the English explanation."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. In the 'Decision Logic' section, it is stated that if data[3] does not match the value of the 'money' variable, but in the rule extraction, it is actually '!data[3].equalsIgnoreCase(money)' which means they are compared for inequality."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. The condition in the second point is incorrect, it should be '!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2])' instead of 'data[3].equalsIgnoreCase(money) && (stringhelper.isEmpty(data[2]))'."
+    ]
   }
 ]
