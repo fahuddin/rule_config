@@ -1,0 +1,43 @@
+{
+  "run_id": "2b113212-266e-41fc-bdb4-18fc0991a482",
+  "started_at": 1770150058.6028094,
+  "ended_at": 1770150072.523339,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1770150058.6028132,
+      "data": {
+        "mode": "tests",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan",
+      "ts": 1770150058.6028173,
+      "data": {
+        "steps": [
+          "parse",
+          "generate_tests"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1770150058.6070101,
+      "data": {
+        "index": 0,
+        "branches": 1,
+        "outputs": []
+      }
+    },
+    {
+      "name": "generate_tests",
+      "ts": 1770150072.5228796,
+      "data": {
+        "count": 2
+      }
+    }
+  ],
+  "final_output": "[\n  {\n    \"name\": \"Reference number exists in reference file\",\n    \"input\": {\n      \"referenceFile\": \"['12345']\",\n      \"transaction\": {\n        \"referenceNumber\": \"12345\"\n      }\n    },\n    \"expected\": {}\n  },\n  {\n    \"name\": \"Reference number does not exist in reference file\",\n    \"input\": {\n      \"referenceFile\": \"[]\",\n      \"transaction\": {\n        \"referenceNumber\": \"12345\"\n      }\n    },\n    \"expected\": {}\n  }\n]"
+}

@@ -1,0 +1,100 @@
+{
+  "run_id": "c757dc8d-5913-4b7e-8fab-892907b0a0c1",
+  "started_at": 1770150230.4529748,
+  "ended_at": 1770150304.1876237,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1770150230.4529767,
+      "data": {
+        "mode": "verify",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan",
+      "ts": 1770150230.4529798,
+      "data": {
+        "steps": [
+          "parse",
+          "static_checks",
+          "retrieve_context",
+          "explain",
+          "reflect",
+          "verify",
+          "rewrite"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1770150230.4563525,
+      "data": {
+        "index": 0,
+        "branches": 1,
+        "outputs": []
+      }
+    },
+    {
+      "name": "static_checks",
+      "ts": 1770150230.4563723,
+      "data": {
+        "issues": [
+          "No DEFAULT/else branch found; rule may be partial or relies on fallthrough.",
+          "Branch 0 has no actions.",
+          "No output assignments detected."
+        ]
+      }
+    },
+    {
+      "name": "retrieve_context",
+      "ts": 1770150230.4573338,
+      "data": {
+        "context_chars": 28430
+      }
+    },
+    {
+      "name": "explain_cache_hit",
+      "ts": 1770150230.4844887,
+      "data": {
+        "rule_hash": "c179da5494166dc9d40fdd339fd2ed0b1ac03ab5d60d8e9fe9f9cb9255cc2c42"
+      }
+    },
+    {
+      "name": "explain",
+      "ts": 1770150271.405179,
+      "data": {
+        "english_chars": 1830
+      }
+    },
+    {
+      "name": "reflect",
+      "ts": 1770150291.5711553,
+      "data": {
+        "issues": 4
+      }
+    },
+    {
+      "name": "verify",
+      "ts": 1770150298.4951606,
+      "data": {
+        "ok": false,
+        "missing": [
+          "Second condition in Branch 1: stringhelper.isEmpty(data[3])",
+          "Condition for Branch 2: referenceFile.contains(transaction.referenceNumber)",
+          "Action for DEFAULT branch: output.getValidContextSetting().setTerminateFurther(true)"
+        ],
+        "rewrite_needed": true
+      }
+    },
+    {
+      "name": "rewrite",
+      "ts": 1770150304.1872897,
+      "data": {
+        "english_chars": 337
+      }
+    }
+  ],
+  "final_output": "Here is a rewritten explanation that matches the rule extraction:\n\nThe decision table contains one branch with a condition. The condition checks if the reference file contains the transaction reference number, which is stored in the `transaction.referenceNumber` variable.\n\nThere are no output assignments detected in this configuration."
+}

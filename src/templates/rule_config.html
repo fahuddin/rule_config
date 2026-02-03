@@ -3,60 +3,86 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Rule Configuration</title>
+    <title>Rule Maintenance</title>
     <style>
-      :root{--bg:#ffffff;--card:#ffffff;--accent:#0f172a;--muted:#6b7280;--border:#e5e7eb}
+      :root{
+        --bg:#ffffff;--card:#ffffff;--accent:#0f172a;--muted:#6b7280;--border:#e5e7eb;
+        --soft:#f8fafc;--warn:#b45309;--good:#065f46
+      }
       html,body{height:100%}
-      body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#000;display:flex;align-items:flex-start;justify-content:center;padding:32px}
-      .container{width:980px;max-width:96%}
-      .card{background:var(--card);border-radius:12px;padding:22px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid var(--border)}
+      body{
+        margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;
+        background:var(--bg);color:#000;display:flex;align-items:flex-start;justify-content:center;padding:32px
+      }
+      .container{width:1020px;max-width:96%}
+      .card{
+        background:var(--card);border-radius:12px;padding:22px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid var(--border)
+      }
       h1{margin:0 0 8px;font-size:20px}
       p.lead{margin:0 0 18px;color:var(--muted)}
-
       .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
       @media (max-width:920px){.grid{grid-template-columns:1fr}}
-
       .form-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}
       label.field{font-size:0.85rem;color:var(--muted);display:block;margin-bottom:6px}
-      select,input[type=text],textarea{padding:10px;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box}
-
+      select,input[type=text],textarea{
+        padding:10px;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box;
+        background:#fff
+      }
+      textarea{resize:vertical}
       .section{background:#fff;padding:12px;border-radius:10px;border:1px solid var(--border)}
       .section h3{margin:0 0 8px;font-size:14px}
       .muted{color:var(--muted);font-size:0.9rem}
-
-      .footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
-      button.primary{background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;border:0;cursor:pointer}
+      .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+      .pill{
+        display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;
+        border:1px solid var(--border);background:#fff;font-size:12px;color:#111
+      }
+      .pill strong{font-weight:600}
+      .footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;flex-wrap:wrap}
+      button{
+        padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+        background:#fff;cursor:pointer
+      }
+      button.primary{background:var(--accent);color:#fff;border-color:transparent}
+      button:disabled{opacity:.55;cursor:not-allowed}
+      .row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+      .hint{background:var(--soft);border:1px dashed var(--border);padding:10px;border-radius:10px}
+      .status{font-size:12px;color:var(--muted)}
+      .status.ok{color:var(--good)}
+      .status.warn{color:var(--warn)}
+      .small{font-size:12px}
+      .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
     </style>
   </head>
+
   <body>
     <div class="container">
       <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <h1 style="margin:0">Rule Configuration</h1>
+        <div class="toolbar">
           <div>
-            <a href="/" style="text-decoration:none"><button style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer">Upload</button></a>
+            <h1 style="margin:0">Rule Maintenance</h1>
+            <p class="lead">Browse rules from Redis, edit details, and run agent modes to generate outputs.</p>
+          </div>
+          <div class="row-actions">
+            <span class="pill"><strong>API</strong> <span class="mono">/api/rules</span></span>
+            <button id="refreshBtn" title="Reload from server">Refresh</button>
           </div>
         </div>
-        <p class="lead">Select application/module, rule type and name to edit rule details.</p>
 
         <div class="grid">
+          <!-- LEFT -->
           <div>
             <div class="section">
               <h3>Application / Module</h3>
               <div class="form-row">
                 <div>
                   <label class="field">Application</label>
-                  <select id="appSelect">
-                    <option value="IFL">IFL</option>
-                  </select>
+                  <select id="appSelect"></select>
                 </div>
                 <div>
                   <label class="field">Sub-module</label>
-                  <select id="subSelect">
-                    <option value="Cash">Cash</option>
-                    <option value="Payment">Payment</option>
-                    <option value="Transfer">Transfer</option>
-                  </select>
+                  <select id="subSelect"></select>
                 </div>
               </div>
 
@@ -64,54 +90,100 @@
               <div class="form-row">
                 <div>
                   <label class="field">Rule Type</label>
-                  <select id="typeSelect">
-                    <option value="ReferenceFileValidation">ReferenceFileValidation</option>
-                    <option value="AccountsValidation">AccountsValidation</option>
-                  </select>
+                  <select id="typeSelect"></select>
                 </div>
                 <div>
                   <label class="field">Rule Name</label>
-                  <select id="ruleSelect">
-                  </select>
+                  <select id="ruleSelect"></select>
                 </div>
               </div>
             </div>
 
             <div style="margin-top:12px" class="section">
               <h3>Rule Details</h3>
+
+              <div class="form-row" style="grid-template-columns:1fr 1fr">
+                <div>
+                  <label class="field">Rule ID</label>
+                  <input id="ruleId" type="text" disabled />
+                </div>
+                <div>
+                  <label class="field">Rule Name</label>
+                  <input id="ruleName" type="text" disabled />
+                </div>
+              </div>
+
               <div style="margin-bottom:8px">
                 <label class="field">Rule Definition</label>
-                <textarea id="ruleDef" rows="6" placeholder="Enter or edit rule definition"></textarea>
+                <textarea id="ruleDef" rows="7" placeholder="Rule definition (MVEL / expression)"></textarea>
               </div>
-              <div>
-                <label class="field">Rule Description</label>
-                <textarea id="ruleDesc" rows="3" placeholder="Friendly description of the rule"></textarea>
+
+              <div style="margin-bottom:8px">
+                <label class="field">Rule Description / Output</label>
+                <textarea id="ruleDesc" rows="4" placeholder="Agent output or saved description"></textarea>
               </div>
 
               <div class="footer">
-                <div class="muted">Changes are local in this demo.</div>
                 <div>
-                  <button class="primary" id="saveBtn">Save</button>
-                  <button id="regenerateBtn" style="margin-left:8px">Regenerate</button>
+                  <div class="status" id="statusText">Ready.</div>
+                  <div class="small muted">
+                    Save writes only <span class="mono">rule_desc</span> via
+                    <span class="mono">POST /api/rules/&lt;id&gt;/description</span>.
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <button class="primary" id="saveBtn">Save Description</button>
+
+                  <div style="min-width:180px">
+                    <label class="field" style="margin-bottom:6px">Agent mode</label>
+                    <select id="modeSelect">
+                      <option value="explain">explain</option>
+                      <option value="diff">diff</option>
+                      <option value="verify">verify</option>
+                      <option value="tests">tests</option>
+                    </select>
+                  </div>
+
+                  <button id="agentBtn">Run Agent</button>
+                  <button id="regenerateBtn" title="Force regenerate (no cache)">Regenerate</button>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- RIGHT -->
           <div>
             <div class="section">
               <h3>Selected Context</h3>
               <div style="margin-top:8px">
-                <p><strong>Application:</strong> <span id="ctxApp">IFL</span></p>
-                <p><strong>Sub-module:</strong> <span id="ctxSub">Cash</span></p>
-                <p><strong>Rule Type:</strong> <span id="ctxType">ReferenceFileValidation</span></p>
+                <p><strong>Application:</strong> <span id="ctxApp">-</span></p>
+                <p><strong>Sub-module:</strong> <span id="ctxSub">-</span></p>
+                <p><strong>Rule Type:</strong> <span id="ctxType">-</span></p>
                 <p><strong>Rule Name:</strong> <span id="ctxName">-</span></p>
               </div>
             </div>
 
             <div style="margin-top:12px" class="section">
+              <h3>Agent Modes</h3>
+              <div class="hint muted">
+                <div><strong>explain</strong>: user-friendly description of the rule.</div>
+                <div style="margin-top:6px"><strong>diff</strong>: highlight changes between current vs saved (if your agent supports it).</div>
+                <div style="margin-top:6px"><strong>verify</strong>: sanity-check and return issues/suggestions.</div>
+                <div style="margin-top:6px"><strong>tests</strong>: propose test cases for the rule.</div>
+                <div style="margin-top:10px" class="small">
+                  Calls <span class="mono">POST /api/generate-description?mode=&lt;mode&gt;</span> with JSON
+                  <span class="mono">{ definition, model, force }</span>.
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px" class="section">
               <h3>Help</h3>
-              <div class="muted">Rule lists are filtered by the selected Rule Type. Edit definition and description, then click Save.</div>
+              <div class="muted">
+                Pick Application/Sub-module/Type to filter rules. Run the agent for explain/diff/verify/tests.
+                Save persists the current text in the output box as <span class="mono">rule_desc</span>.
+              </div>
             </div>
           </div>
         </div>
@@ -119,158 +191,245 @@
     </div>
 
     <script>
-      // Data maps
-      const ruleMap = {
-        'ReferenceFileValidation': ['DuplicateValidation','MandatoryFieldValidation'],
-        'AccountsValidation': ['AccountFieldRule']
-      };
-
-      // Prefilled rule definitions (descriptions will be generated by the LLM)
-      const ruleData = {
-        'DuplicateValidation': {
-          definition: 'Check input file for duplicate rows based on key columns and flag duplicates for review.'
-        },
-        'MandatoryFieldValidation': {
-          definition: 'Ensure required fields are present and non-empty for every record; list missing fields per row.'
-        },
-        'AccountFieldRule': {
-          definition: 'Validate account numbers against allowed patterns and check account status via lookup table.'
-        }
-      };
-
       // Elements
+      const appSelect = document.getElementById('appSelect');
+      const subSelect = document.getElementById('subSelect');
       const typeSelect = document.getElementById('typeSelect');
       const ruleSelect = document.getElementById('ruleSelect');
-      const preview = document.getElementById('preview');
+
       const ctxApp = document.getElementById('ctxApp');
       const ctxSub = document.getElementById('ctxSub');
       const ctxType = document.getElementById('ctxType');
       const ctxName = document.getElementById('ctxName');
-      const appSelect = document.getElementById('appSelect');
-      const subSelect = document.getElementById('subSelect');
+
+      const ruleId = document.getElementById('ruleId');
+      const ruleName = document.getElementById('ruleName');
       const ruleDef = document.getElementById('ruleDef');
       const ruleDesc = document.getElementById('ruleDesc');
+
+      const modeSelect = document.getElementById('modeSelect');
       const saveBtn = document.getElementById('saveBtn');
-      // track the latest generation request to avoid race conditions / double updates
+      const regenerateBtn = document.getElementById('regenerateBtn');
+      const agentBtn = document.getElementById('agentBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const statusText = document.getElementById('statusText');
+
+      // Data
+      let allRules = [];
+      let selectedRule = null;
       let currentGenId = 0;
 
-      function populateRulesForType(type){
-        ruleSelect.innerHTML = '';
-        const list = ruleMap[type] || [];
-        list.forEach(r => {
+      const model = "llama3.1"; // default; add a selector if needed
+
+      // Helpers
+      const uniq = (arr) => [...new Set(arr.filter(v => String(v || '').trim() !== ''))];
+
+      function setStatus(msg, kind="") {
+        statusText.className = "status " + (kind || "");
+        statusText.textContent = msg;
+      }
+
+      function setOptions(selectEl, values, preferredValue = null) {
+        selectEl.innerHTML = '';
+        values.forEach(v => {
           const opt = document.createElement('option');
-          opt.value = r; opt.textContent = r;
-          ruleSelect.appendChild(opt);
+          opt.value = v;
+          opt.textContent = v;
+          selectEl.appendChild(opt);
         });
-        if(list.length) ruleSelect.selectedIndex = 0;
-        // generate definition for initial selection
-        const first = ruleSelect.value;
-        if(first) generateDefinition(first);
+        if (preferredValue && values.includes(preferredValue)) {
+          selectEl.value = preferredValue;
+        } else if (values.length) {
+          selectEl.selectedIndex = 0;
+        }
       }
 
-      function updatePreview(){
-        const type = typeSelect.value;
-        const rule = ruleSelect.value || '-';
-        ctxType.textContent = type;
-        ctxName.textContent = rule;
+      function updateContext() {
+        ctxApp.textContent = appSelect.value || '-';
+        ctxSub.textContent = subSelect.value || '-';
+        ctxType.textContent = typeSelect.value || '-';
+        ctxName.textContent = ruleSelect.value || '-';
       }
 
-      // Use local prefilled data for rule definition/description
-      function generateDefinition(rule){
-        ctxName.textContent = rule;
-        if(rule && ruleData[rule]){
-          ruleDef.value = ruleData[rule].definition;
-          // Clear any existing description — we'll generate via the LLM
-          ruleDesc.value = '';
-        } else {
+      function getFilteredRules() {
+        const app = appSelect.value;
+        const sub = subSelect.value;
+        const typ = typeSelect.value;
+        return allRules.filter(r =>
+          (!app || r.application === app) &&
+          (!sub || r.sub_module === sub) &&
+          (!typ || r.rule_type === typ)
+        );
+      }
+
+      function repopulateSelectors() {
+        const prevApp = appSelect.value;
+        const prevSub = subSelect.value;
+        const prevType = typeSelect.value;
+        const prevName = ruleSelect.value;
+
+        const apps = uniq(allRules.map(r => r.application));
+        setOptions(appSelect, apps, prevApp);
+
+        const subs = uniq(allRules
+          .filter(r => r.application === appSelect.value)
+          .map(r => r.sub_module)
+        );
+        setOptions(subSelect, subs, prevSub);
+
+        const types = uniq(allRules
+          .filter(r => r.application === appSelect.value && r.sub_module === subSelect.value)
+          .map(r => r.rule_type)
+        );
+        setOptions(typeSelect, types, prevType);
+
+        const names = uniq(getFilteredRules().map(r => r.rule_name));
+        setOptions(ruleSelect, names, prevName);
+
+        updateContext();
+      }
+
+      function selectCurrentRule() {
+        const name = ruleSelect.value;
+        const candidates = getFilteredRules();
+        selectedRule = candidates.find(r => r.rule_name === name) || null;
+
+        if (!selectedRule) {
+          ruleId.value = '';
+          ruleName.value = '';
           ruleDef.value = '';
           ruleDesc.value = '';
+          updateContext();
+          setStatus("No rule selected.", "warn");
+          return;
         }
-        updatePreview();
 
-        // Request the server-side LLM to generate a description and update the UI.
-        if(ruleDef.value && ruleDef.value.trim()){
-          // create a generation id so only the latest response applies
-          const genId = ++currentGenId;
-          ruleDesc.value = 'Generating description...';
-          fetch('/api/generate-description', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ definition: ruleDef.value })
-          })
-          .then(r => r.json())
-          .then(data => {
-            // ignore if a newer generation was started
-            if(genId !== currentGenId) return;
-            if(data && data.description && data.description.trim()){
-              ruleDesc.value = data.description.trim();
-            } else {
-              ruleDesc.value = '';
-            }
-          })
-          .catch(err => {
-            if(genId !== currentGenId) return;
-            console.warn('LLM description fetch failed:', err);
-            ruleDesc.value = '';
-          });
+        ruleId.value = selectedRule.rule_id || '';
+        ruleName.value = selectedRule.rule_name || '';
+        ruleDef.value = selectedRule.rule_def || '';
+        ruleDesc.value = selectedRule.rule_desc || '';
+
+        updateContext();
+        setStatus("Loaded rule from Redis.", "ok");
+
+        // Auto-generate description if missing
+        if (ruleDef.value.trim() && !ruleDesc.value.trim()) {
+          generateAgentOutput(ruleDef.value, false, "explain");
         }
       }
 
-      // initial populate
-      populateRulesForType(typeSelect.value);
-      ctxApp.textContent = appSelect.value;
-      ctxSub.textContent = subSelect.value;
+      async function loadRulesFromServer() {
+        setStatus("Loading rules...", "");
+        const res = await fetch('/api/rules');
+        const data = await res.json();
+        allRules = (data && data.rules) ? data.rules : [];
+        setStatus(`Loaded ${allRules.length} rules.`, "ok");
+      }
 
-      // event listeners
-      typeSelect.addEventListener('change', ()=>{ populateRulesForType(typeSelect.value); });
-      ruleSelect.addEventListener('change', ()=>{ generateDefinition(ruleSelect.value); });
-      appSelect.addEventListener('change', ()=>{ ctxApp.textContent = appSelect.value; });
-      subSelect.addEventListener('change', ()=>{ ctxSub.textContent = subSelect.value; });
+      function generateAgentOutput(definition, force=false, modeOverride=null) {
+        if (!definition || !definition.trim()) return;
 
-      saveBtn.addEventListener('click', (e)=>{
-        e.preventDefault();
-        const payload = {
-          application: appSelect.value,
-          submodule: subSelect.value,
-          ruleType: typeSelect.value,
-          ruleName: ruleSelect.value,
-          definition: ruleDef.value,
-          description: ruleDesc.value
-        };
-        // For now just show preview and log — in a real app we'd POST this to the server
-        console.log('Save payload:', payload);
-        alert('Rule saved locally (demo). Check console for payload.');
-      });
-
-      // Regenerate button: force LLM regeneration of the description
-      const regenerateBtn = document.getElementById('regenerateBtn');
-      regenerateBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if(!ruleDef.value || !ruleDef.value.trim()) return;
         const genId = ++currentGenId;
-        ruleDesc.value = 'Regenerating description...';
+        const modeToUse = modeOverride || modeSelect.value || "explain";
+
+        ruleDesc.value = force ? "Regenerating..." : "Generating...";
         regenerateBtn.disabled = true;
-        fetch('/api/generate-description', {
+        agentBtn.disabled = true;
+
+        setStatus(`Agent running in "${modeToUse}" mode...`, "");
+
+        // Flask reads mode from request.form in your snippet, but easiest is querystring.
+        fetch(`/api/generate-description?mode=${encodeURIComponent(modeToUse)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ definition: ruleDef.value, force: true })
+          body: JSON.stringify({mode: modeToUse, definition, model, force })
         })
         .then(r => r.json())
         .then(data => {
-          if(genId !== currentGenId) return;
-          if(data && data.description && data.description.trim()){
-            ruleDesc.value = data.description.trim();
-          } else {
-            ruleDesc.value = '';
-          }
+          if (genId !== currentGenId) return;
+          const out = (data && data.description) ? String(data.description).trim() : '';
+          ruleDesc.value = out;
+
+          if (selectedRule) selectedRule.rule_desc = out;
+
+          setStatus("Agent finished.", "ok");
         })
         .catch(err => {
-          if(genId !== currentGenId) return;
-          console.warn('LLM regenerate failed:', err);
+          if (genId !== currentGenId) return;
+          console.warn('Agent call failed:', err);
           ruleDesc.value = '';
+          setStatus("Agent failed. Check server logs.", "warn");
         })
-        .finally(() => { regenerateBtn.disabled = false; });
+        .finally(() => {
+          regenerateBtn.disabled = false;
+          agentBtn.disabled = false;
+        });
+      }
+
+      // Events: selectors
+      appSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
+      subSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
+      typeSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
+      ruleSelect.addEventListener('change', () => { selectCurrentRule(); });
+
+      // Refresh
+      refreshBtn.addEventListener('click', async () => {
+        await loadRulesFromServer();
+        repopulateSelectors();
+        selectCurrentRule();
       });
+
+      // Save description (per your Flask endpoint)
+      saveBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!selectedRule || !selectedRule.rule_id) {
+          alert('No rule selected.');
+          return;
+        }
+
+        const desc = (ruleDesc.value || '').trim();
+        if (!desc) {
+          alert('Description/output is empty.');
+          return;
+        }
+
+        setStatus("Saving description...", "");
+        const resp = await fetch(`/api/rules/${encodeURIComponent(selectedRule.rule_id)}/description`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description: desc })
+        });
+
+        if (resp.ok) {
+          setStatus("Saved to Redis.", "ok");
+          selectedRule.rule_desc = desc;
+        } else {
+          const err = await resp.json().catch(() => ({}));
+          setStatus("Save failed.", "warn");
+          alert('Save failed: ' + (err.error || resp.status));
+        }
+      });
+
+      // Run agent
+      agentBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!ruleDef.value || !ruleDef.value.trim()) return;
+        generateAgentOutput(ruleDef.value, false, modeSelect.value);
+      });
+
+      // Force regenerate (no cache)
+      regenerateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!ruleDef.value || !ruleDef.value.trim()) return;
+        generateAgentOutput(ruleDef.value, true, modeSelect.value);
+      });
+
+      // Init
+      (async function init() {
+        await loadRulesFromServer();
+        repopulateSelectors();
+        selectCurrentRule();
+      })();
     </script>
   </body>
 </html>
