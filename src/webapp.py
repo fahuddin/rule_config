@@ -102,21 +102,18 @@ def generate_description():
     data = request.get_json(force=True) or {}
     definition = data.get('definition', '')
     model = data.get('model', 'llama3.1')
+    mode = data.get('mode', "explain")
     force = bool(data.get('force', False))
+    try:
+        result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=True)
+    except Exception as e:
+        result = f"Error running agent: {e}"
 
-    if not definition:
+    if not result:
         return jsonify({'description': ''}), 200
 
-    prompt = (
-    "You are an expert at translating rule logic into plain English for non-technical users. "
-    "Given the following MVEL rule definition, write a clear, concise description (1–2 sentences) "
-    "that explains what the rule checks and what happens when it matches. "
-    "Avoid code syntax, variable names, and implementation details. "
-    "Focus on the business meaning and outcome.\n\n"
-    f"MVEL Rule:\n{definition}\n\n"
-    "Plain-English Description:")
 
-    def _clean_text(text: str, definition: str) -> str:
+    def _clean_text(text: str) -> str:
         """Clean generated text by removing assistant lead-ins, extraneous characters,
         and sentences that simply restate the provided definition.
         """
@@ -195,26 +192,8 @@ def generate_description():
                 else:
                     del _desc_cache[key]
 
-    try:
-        llm = get_llm(model=model, temperature=0.0)
-        # Use HumanMessage to call chat-style generate
-        res = llm.generate([[HumanMessage(content=prompt)]])
-        text = ''
-        gens = getattr(res, 'generations', None)
-        if gens and len(gens) and len(gens[0]):
-            gen0 = gens[0][0]
-            # prefer plain text, then message.content
-            if hasattr(gen0, 'text') and gen0.text:
-                text = gen0.text
-            elif hasattr(gen0, 'message') and getattr(gen0.message, 'content', None):
-                text = gen0.message.content
-            else:
-                text = str(gen0)
-    except Exception as e:
-        logging.exception('LLM generation failed')
-        text = ''
 
-    cleaned = _clean_text(text, definition)
+    cleaned = _clean_text(result)
     # store in cache
     try:
         with _cache_lock:
