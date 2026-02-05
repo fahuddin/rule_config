@@ -273,5 +273,64 @@
         ]
       }
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not match the rule extraction. The rule extraction has no condition for checking the length of the input data array, but the English explanation mentions it.",
+      "The English explanation mentions a condition to check if the fourth element in the input data array (data[3]) matches the value of the 'money' variable, which is not present in the rule extraction.",
+      "The English explanation also mentions a condition to check if the second element in the input data array (data[2]) is not empty, but this is not present in the rule extraction."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "The English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "MISMATCH",
+        "message": "The rule extraction has a single branch, but the English explanation mentions two branches (Branch 1 and Branch 2) and a DEFAULT branch."
+      },
+      {
+        "code": "MISMATCH",
+        "message": "The condition in the first branch of the English explanation is not present in the rule extraction. The rule extraction checks if a reference number exists in a reference file, but the English explanation mentions checking for null or length 3 or more input data."
+      },
+      {
+        "code": "MISMATCH",
+        "message": "The second branch mentioned in the English explanation does not exist in the rule extraction. It also incorrectly states that the fourth element matches the value of the 'money' variable and the second element is empty, which are not present in the rule extraction."
+      },
+      {
+        "code": "MISMATCH",
+        "message": "The DEFAULT branch mentioned in the English explanation does not exist in the rule extraction. The rule extraction has no actions for any condition, but the English explanation states that it takes certain actions if none of the conditions are met."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction: The English explanation mentions a DEFAULT branch with no specific condition checked, but this is not present in the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "The rule extraction does not contain a DEFAULT/else branch, which may indicate that the rule relies on fallthrough behavior or is partial."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "The English explanation incorrectly mentions a DEFAULT branch that is not present in the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "The English explanation does not fully explain the purpose of the rule, it only describes one branch and its condition."
+      }
+    ]
   }
 ]

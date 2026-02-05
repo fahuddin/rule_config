@@ -79,6 +79,18 @@
 
             <div style="margin-top:12px" class="section">
               <h3>Rule Details</h3>
+
+              <!-- NEW: Mode dropdown -->
+              <div style="margin-bottom:12px">
+                <label class="field">Mode</label>
+                <select id="modeSelect">
+                  <option value="explain">explain</option>
+                  <option value="verify">verify</option>
+                  <option value="tests">tests</option>
+                  <option value="diff">diff</option>
+                </select>
+              </div>
+
               <div style="margin-bottom:8px">
                 <label class="field">Rule Definition</label>
                 <textarea id="ruleDef" rows="6" placeholder="Enter or edit rule definition"></textarea>
@@ -106,6 +118,8 @@
                 <p><strong>Sub-module:</strong> <span id="ctxSub">Cash</span></p>
                 <p><strong>Rule Type:</strong> <span id="ctxType">ReferenceFileValidation</span></p>
                 <p><strong>Rule Name:</strong> <span id="ctxName">-</span></p>
+                <!-- NEW: Mode in context -->
+                <p><strong>Mode:</strong> <span id="ctxMode">explain</span></p>
               </div>
             </div>
 
@@ -119,213 +133,226 @@
     </div>
 
     <script>
-  // Elements
-  const typeSelect = document.getElementById('typeSelect');
-  const ruleSelect = document.getElementById('ruleSelect');
-  const ctxApp = document.getElementById('ctxApp');
-  const ctxSub = document.getElementById('ctxSub');
-  const ctxType = document.getElementById('ctxType');
-  const ctxName = document.getElementById('ctxName');
-  const appSelect = document.getElementById('appSelect');
-  const subSelect = document.getElementById('subSelect');
-  const ruleDef = document.getElementById('ruleDef');
-  const ruleDesc = document.getElementById('ruleDesc');
-  const saveBtn = document.getElementById('saveBtn');
-  const regenerateBtn = document.getElementById('regenerateBtn');
+      // Elements
+      const typeSelect = document.getElementById('typeSelect');
+      const ruleSelect = document.getElementById('ruleSelect');
+      const ctxApp = document.getElementById('ctxApp');
+      const ctxSub = document.getElementById('ctxSub');
+      const ctxType = document.getElementById('ctxType');
+      const ctxName = document.getElementById('ctxName');
+      const ctxMode = document.getElementById('ctxMode'); // NEW
+      const appSelect = document.getElementById('appSelect');
+      const subSelect = document.getElementById('subSelect');
+      const ruleDef = document.getElementById('ruleDef');
+      const ruleDesc = document.getElementById('ruleDesc');
+      const saveBtn = document.getElementById('saveBtn');
+      const regenerateBtn = document.getElementById('regenerateBtn');
+      const modeSelect = document.getElementById('modeSelect'); // NEW
 
-  // Local cache of Redis rules
-  let allRules = [];           // array of objects from /api/rules
-  let selectedRule = null;     // currently selected rule object
-  let currentGenId = 0;        // prevent race-condition updates
+      // Local cache of Redis rules
+      let allRules = [];           // array of objects from /api/rules
+      let selectedRule = null;     // currently selected rule object
+      let currentGenId = 0;        // prevent race-condition updates
 
-  // Helpers
-  const uniq = (arr) => [...new Set(arr.filter(v => String(v || '').trim() !== ''))];
+      // Helpers
+      const uniq = (arr) => [...new Set(arr.filter(v => String(v || '').trim() !== ''))];
 
-  function setOptions(selectEl, values, preferredValue = null) {
-    selectEl.innerHTML = '';
-    values.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v;
-      opt.textContent = v;
-      selectEl.appendChild(opt);
-    });
-    if (preferredValue && values.includes(preferredValue)) {
-      selectEl.value = preferredValue;
-    } else if (values.length) {
-      selectEl.selectedIndex = 0;
-    }
-  }
+      function setOptions(selectEl, values, preferredValue = null) {
+        selectEl.innerHTML = '';
+        values.forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v;
+          selectEl.appendChild(opt);
+        });
+        if (preferredValue && values.includes(preferredValue)) {
+          selectEl.value = preferredValue;
+        } else if (values.length) {
+          selectEl.selectedIndex = 0;
+        }
+      }
 
-  function updateContext() {
-    ctxApp.textContent = appSelect.value || '-';
-    ctxSub.textContent = subSelect.value || '-';
-    ctxType.textContent = typeSelect.value || '-';
-    ctxName.textContent = ruleSelect.value || '-';
-  }
+      function updateContext() {
+        ctxApp.textContent = appSelect.value || '-';
+        ctxSub.textContent = subSelect.value || '-';
+        ctxType.textContent = typeSelect.value || '-';
+        ctxName.textContent = ruleSelect.value || '-';
+        if (ctxMode) ctxMode.textContent = (modeSelect && modeSelect.value) ? modeSelect.value : '-'; // NEW
+      }
 
-  function getFilteredRules() {
-    const app = appSelect.value;
-    const sub = subSelect.value;
-    const typ = typeSelect.value;
-    return allRules.filter(r =>
-      (!app || r.application === app) &&
-      (!sub || r.sub_module === sub) &&
-      (!typ || r.rule_type === typ)
-    );
-  }
+      function getFilteredRules() {
+        const app = appSelect.value;
+        const sub = subSelect.value;
+        const typ = typeSelect.value;
+        return allRules.filter(r =>
+          (!app || r.application === app) &&
+          (!sub || r.sub_module === sub) &&
+          (!typ || r.rule_type === typ)
+        );
+      }
 
-  function repopulateSelectors() {
-    const prevApp = appSelect.value;
-    const prevSub = subSelect.value;
-    const prevType = typeSelect.value;
-    const prevName = ruleSelect.value;
+      function repopulateSelectors() {
+        const prevApp = appSelect.value;
+        const prevSub = subSelect.value;
+        const prevType = typeSelect.value;
+        const prevName = ruleSelect.value;
 
-    // Applications
-    const apps = uniq(allRules.map(r => r.application));
-    setOptions(appSelect, apps, prevApp);
+        // Applications
+        const apps = uniq(allRules.map(r => r.application));
+        setOptions(appSelect, apps, prevApp);
 
-    // Sub-modules for selected application
-    const subs = uniq(allRules
-      .filter(r => r.application === appSelect.value)
-      .map(r => r.sub_module)
-    );
-    setOptions(subSelect, subs, prevSub);
+        // Sub-modules for selected application
+        const subs = uniq(allRules
+          .filter(r => r.application === appSelect.value)
+          .map(r => r.sub_module)
+        );
+        setOptions(subSelect, subs, prevSub);
 
-    // Rule types for selected app/sub
-    const types = uniq(allRules
-      .filter(r => r.application === appSelect.value && r.sub_module === subSelect.value)
-      .map(r => r.rule_type)
-    );
-    setOptions(typeSelect, types, prevType);
+        // Rule types for selected app/sub
+        const types = uniq(allRules
+          .filter(r => r.application === appSelect.value && r.sub_module === subSelect.value)
+          .map(r => r.rule_type)
+        );
+        setOptions(typeSelect, types, prevType);
 
-    // Rule names for selected app/sub/type
-    const names = uniq(getFilteredRules().map(r => r.rule_name));
-    setOptions(ruleSelect, names, prevName);
+        // Rule names for selected app/sub/type
+        const names = uniq(getFilteredRules().map(r => r.rule_name));
+        setOptions(ruleSelect, names, prevName);
 
-    updateContext();
-  }
+        updateContext();
+      }
 
-  function selectCurrentRule() {
-    const name = ruleSelect.value;
-    const candidates = getFilteredRules();
-    selectedRule = candidates.find(r => r.rule_name === name) || null;
+      function selectCurrentRule() {
+        const name = ruleSelect.value;
+        const candidates = getFilteredRules();
+        selectedRule = candidates.find(r => r.rule_name === name) || null;
 
-    if (!selectedRule) {
-      ruleDef.value = '';
-      ruleDesc.value = '';
-      updateContext();
-      return;
-    }
+        if (!selectedRule) {
+          ruleDef.value = '';
+          ruleDesc.value = '';
+          updateContext();
+          return;
+        }
 
-    // Populate from Redis fields
-    ruleDef.value = selectedRule.rule_def || '';
-    ruleDesc.value = selectedRule.rule_desc || ''; // if you store it in Redis
-    updateContext();
+        // Populate from Redis fields
+        ruleDef.value = selectedRule.rule_def || '';
+        ruleDesc.value = selectedRule.rule_desc || ''; // if you store it in Redis
+        updateContext();
 
-    // Auto-generate description if missing
-    if (ruleDef.value.trim() && !ruleDesc.value.trim()) {
-      generateDescription(ruleDef.value, false);
-    }
-  }
+        // Auto-generate description if missing
+        if (ruleDef.value.trim() && !ruleDesc.value.trim()) {
+          generateDescription(ruleDef.value, false);
+        }
+      }
 
-  function generateDescription(definition, force=false) {
-    if (!definition || !definition.trim()) return;
+      function generateDescription(definition, force=false) {
+        if (!definition || !definition.trim()) return;
 
-    const genId = ++currentGenId;
-    ruleDesc.value = force ? 'Regenerating description...' : 'Generating description...';
-    regenerateBtn.disabled = true;
+        const mode = modeSelect ? modeSelect.value : 'explain'; // NEW
 
-    fetch('/api/generate-description', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ definition, force })
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (genId !== currentGenId) return;
-      const desc = (data && data.description) ? data.description.trim() : '';
-      ruleDesc.value = desc;
+        const genId = ++currentGenId;
+        ruleDesc.value = force ? 'Regenerating description...' : 'Generating description...';
+        regenerateBtn.disabled = true;
 
-      // keep local cache in sync
-      if (selectedRule) selectedRule.rule_desc = desc;
-    })
-    .catch(err => {
-      if (genId !== currentGenId) return;
-      console.warn('LLM description fetch failed:', err);
-      ruleDesc.value = '';
-    })
-    .finally(() => {
-      regenerateBtn.disabled = false;
-    });
-  }
+        fetch('/api/generate-description', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ definition, force, mode }) // NEW
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (genId !== currentGenId) return;
+          const desc = (data && data.description) ? data.description.trim() : '';
+          ruleDesc.value = desc;
 
-  async function loadRulesFromServer() {
-    const res = await fetch('/api/rules');
-    const data = await res.json();
-    allRules = (data && data.rules) ? data.rules : [];
-  }
+          // keep local cache in sync
+          if (selectedRule) selectedRule.rule_desc = desc;
+        })
+        .catch(err => {
+          if (genId !== currentGenId) return;
+          console.warn('LLM description fetch failed:', err);
+          ruleDesc.value = '';
+        })
+        .finally(() => {
+          regenerateBtn.disabled = false;
+        });
+      }
 
-  // Event listeners
-  appSelect.addEventListener('change', () => {
-    repopulateSelectors();
-    selectCurrentRule();
-  });
+      async function loadRulesFromServer() {
+        const res = await fetch('/api/rules');
+        const data = await res.json();
+        allRules = (data && data.rules) ? data.rules : [];
+      }
 
-  subSelect.addEventListener('change', () => {
-    repopulateSelectors();
-    selectCurrentRule();
-  });
+      // Event listeners
+      appSelect.addEventListener('change', () => {
+        repopulateSelectors();
+        selectCurrentRule();
+      });
 
-  typeSelect.addEventListener('change', () => {
-    repopulateSelectors();
-    selectCurrentRule();
-  });
+      subSelect.addEventListener('change', () => {
+        repopulateSelectors();
+        selectCurrentRule();
+      });
 
-  ruleSelect.addEventListener('change', () => {
-    selectCurrentRule();
-  });
+      typeSelect.addEventListener('change', () => {
+        repopulateSelectors();
+        selectCurrentRule();
+      });
 
-  // Save: write description back to Redis (requires backend endpoint)
-  saveBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    if (!selectedRule || !selectedRule.rule_id) {
-      alert('No rule selected.');
-      return;
-    }
+      ruleSelect.addEventListener('change', () => {
+        selectCurrentRule();
+      });
 
-    const payload = {
-      description: ruleDesc.value || ''
-    };
+      // NEW: mode changes update context (optional: auto-regenerate if you want)
+      if (modeSelect) {
+        modeSelect.addEventListener('change', () => {
+          updateContext();
+          // Optional behavior:
+          // if (ruleDef.value.trim()) generateDescription(ruleDef.value, true);
+        });
+      }
 
-    // This endpoint must exist on Flask (see note below)
-    const resp = await fetch(`/api/rules/${selectedRule.rule_id}/description`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+      // Save: write description back to Redis (requires backend endpoint)
+      saveBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!selectedRule || !selectedRule.rule_id) {
+          alert('No rule selected.');
+          return;
+        }
 
-    if (resp.ok) {
-      alert('Saved to Redis.');
-    } else {
-      const err = await resp.json().catch(() => ({}));
-      alert('Save failed: ' + (err.error || resp.status));
-    }
-  });
+        const payload = {
+          description: ruleDesc.value || '',
+          mode: modeSelect ? modeSelect.value : 'explain' // OPTIONAL (safe to include)
+        };
 
-  regenerateBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!ruleDef.value || !ruleDef.value.trim()) return;
-    generateDescription(ruleDef.value, true);
-  });
+        // This endpoint must exist on Flask (see note below)
+        const resp = await fetch(`/api/rules/${selectedRule.rule_id}/description`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-  // Init
-  (async function init() {
-    await loadRulesFromServer();
-    repopulateSelectors();
-    selectCurrentRule();
-  })();
-</script>
+        if (resp.ok) {
+          alert('Saved to Redis.');
+        } else {
+          const err = await resp.json().catch(() => ({}));
+          alert('Save failed: ' + (err.error || resp.status));
+        }
+      });
 
+      regenerateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!ruleDef.value || !ruleDef.value.trim()) return;
+        generateDescription(ruleDef.value, true);
+      });
 
+      // Init
+      (async function init() {
+        await loadRulesFromServer();
+        repopulateSelectors();
+        selectCurrentRule();
+      })();
+    </script>
   </body>
 </html>

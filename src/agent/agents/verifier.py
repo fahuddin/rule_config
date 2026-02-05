@@ -17,7 +17,6 @@ def verify_explanation(llm, extraction: dict, english: str) -> Dict[str, Any]:
     chain = VERIFY_PROMPT | llm | StrOutputParser()
     extraction_json = json.dumps(extraction, ensure_ascii=False, indent=2)
     raw = chain.invoke({"extraction_json": extraction_json, "english": english})
-    print(raw)
     verdict = _parse_json_only(raw)
     # normalize keys
     verdict.setdefault("ok", True)

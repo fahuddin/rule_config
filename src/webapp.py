@@ -75,24 +75,6 @@ def api_rule(rule_id):
 def rule_config():
     return render_template('rule_config.html')
 
-@app.route('/process', methods=['POST'])
-def process():
-    mode = request.form.get('mode', 'explain')
-    model = request.form.get('model', 'llama3.1')
-    trace = bool(request.form.get('trace'))
-
-    uploaded = request.files.get('mvelfile')
-    if not uploaded or uploaded.filename == '':
-        return redirect(url_for('index'))
-
-    text = uploaded.read().decode('utf-8', errors='replace')
-
-    try:
-        result = run(mode=mode, mvel_texts=[text], model=model, enable_trace=trace)
-    except Exception as e:
-        result = f"Error running agent: {e}"
-
-    return render_template('result.html', mode=mode, filename=uploaded.filename, output=result)
 
 
 
@@ -102,7 +84,7 @@ def generate_description():
     data = request.get_json(force=True) or {}
     definition = data.get('definition', '')
     model = data.get('model', 'llama3.1')
-    mode = data.get('mode', "explain")
+    mode = data.get('mode', "verify")
     force = bool(data.get('force', False))
     try:
         result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=True)
