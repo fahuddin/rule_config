@@ -332,5 +332,11 @@
         "message": "The English explanation does not fully explain the purpose of the rule, it only describes one branch and its condition."
       }
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
   }
 ]
