@@ -464,5 +464,362 @@
         "message": "DEFAULT/else branch is missing."
       }
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
   }
 ]

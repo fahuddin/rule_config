@@ -78,7 +78,6 @@ def rule_config():
 
 
 
-# API: generate a short user-facing description from a rule definition using the local LLM
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():
     data = request.get_json(force=True) or {}
@@ -86,57 +85,39 @@ def generate_description():
     model = data.get('model', 'llama3.1')
     mode = data.get('mode', "verify")
     force = bool(data.get('force', False))
-    try:
-        result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=True)
-    except Exception as e:
-        result = f"Error running agent: {e}"
-
-    if not result:
-        return jsonify({'description': ''}), 200
-
 
     def _clean_text(text: str) -> str:
-        """Clean generated text by removing assistant lead-ins, extraneous characters,
-        and sentences that simply restate the provided definition.
-        """
         if not text:
             return ''
         t = text.strip()
-        # remove common assistant lead-ins like "Here is..." or "Here's..."
         t = re.sub(r"^\s*(Here is(?: a)?(?: .*?)?:|Here\'s:?|Here you go:?|Here you are:?|Assistant:|Response:)\s*\n*", '', t, flags=re.I)
-        # remove any leading label line that ends with ':'
         t = re.sub(r"^.*?:\s*\n+", '', t, count=1)
-        # normalize whitespace and remove control chars
         t = re.sub(r"[\x00-\x1f\x7f]+", ' ', t)
         t = re.sub(r"\s+", ' ', t).strip()
 
-        # split into sentences (simple heuristic) include : and ; as sentence boundaries
         sentences = re.split(r'(?<=[\.!?;:])\s+', t)
 
         def word_set(s: str):
             return set([w for w in re.findall(r"\w+", s.lower())])
 
         def is_restatement(s: str) -> bool:
-            # skip very short fragments
             if len(s.strip()) < 10:
                 return True
-            # common starter phrases that often repeat the rule
             if re.match(r"^\s*(the rule|this rule|it checks|it validates|it ensures|it verifies|ensures|verifies|validates|checks)\b", s.strip(), flags=re.I):
                 return True
-            # markers that indicate paraphrase/alternate phrasing
             if re.search(r"\balternatively\b|\balso\b|\bin summary\b|\bfor example\b", s, flags=re.I):
                 return True
-            # high overlap with definition
+
             def_words = word_set(definition)
             sent_words = word_set(s)
             if not def_words or not sent_words:
                 return False
+
             overlap = len(def_words & sent_words) / max(1, len(def_words))
-            # also consider proportion relative to sentence length
             overlap_sent = len(def_words & sent_words) / max(1, len(sent_words))
             if overlap > 0.45 or overlap_sent > 0.45:
                 return True
-            # heuristic: phrases that indicate a validation restatement
+
             if 'validation' in s.lower() and 'account' in s.lower():
                 return True
             return False
@@ -148,42 +129,56 @@ def generate_description():
             kept.append(s.strip())
 
         out = ' '.join(kept).strip()
-        # if aggressive filtering removed everything, fall back to the cleaned original text
         if not out:
             out = t
-        # remove quotation characters (straight and smart quotes)
+
         out = out.strip()
         out = out.replace('"', '').replace("'", '')
         out = out.replace('“', '').replace('”', '').replace('‘', '').replace('’', '')
         out = out.replace('«', '').replace('»', '')
-        # final cleanup: remove repeated newlines and normalize whitespace
         out = re.sub(r"[\r\n]+", ' ', out)
         out = re.sub(r"\s+", ' ', out).strip()
         return out
 
-    # cache key based on normalized definition and model
-    key = hashlib.sha256((definition + '||' + model).encode('utf-8')).hexdigest()
-    # check cache unless force=true
+    # ✅ cache key MUST include mode (and preferably force doesn't cache anyway)
+    key = hashlib.sha256((definition + '||' + model + '||' + mode).encode('utf-8')).hexdigest()
+
+    # ✅ Cache read (return BOTH description + trace so UI updates even on cache hits)
     if not force:
         with _cache_lock:
             entry = _desc_cache.get(key)
             if entry:
-                desc, ts = entry
+                payload, ts = entry
                 if time.time() - ts < CACHE_TTL:
-                    return jsonify({'description': desc}), 200
+                    return jsonify(payload), 200
                 else:
                     del _desc_cache[key]
 
-
-    cleaned = _clean_text(result)
-    # store in cache
+    # ✅ Always define result/text/trace
     try:
-        with _cache_lock:
-            _desc_cache[key] = (cleaned, time.time())
-    except Exception:
-        logging.exception('Failed to write cache')
+        result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=True)
+        if isinstance(result, str):
+            result = {"output": result, "trace": None}
+    except Exception as e:
+        logging.exception("Error running agent")
+        result = {"output": f"Error running agent: {e}", "trace": None}
 
-    return jsonify({'description': cleaned}), 200
+    text = (result.get("output") or "").strip()
+    trace = result.get("trace")
+
+    cleaned = _clean_text(text)
+
+    payload = {"description": cleaned, "trace": trace}
+
+    if not force:
+        try:
+            with _cache_lock:
+                _desc_cache[key] = (payload, time.time())
+        except Exception:
+            logging.exception('Failed to write cache')
+
+    return jsonify(payload), 200
+
 
 @app.route("/api/rules/<rule_id>/description", methods=["POST"])
 def api_save_description(rule_id):

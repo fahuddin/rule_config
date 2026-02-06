@@ -20,6 +20,16 @@ class Trace:
             "ts": time.time(),
             "data": data
         })
+    
+    def to_dict(self):
+        """Return JSON-serializable trace"""
+        return {
+            "run_id": self.run_id,
+            "started_at": self.started_at,
+            "ended_at": time.time(),
+            "steps": self.steps,
+            "final_output": self.final_output,
+        }
 
     def finish(self, output: str):
         self.final_output = output

@@ -12,8 +12,15 @@
         /* reasoning ui */
         --chip:#f1f5f9;
         --chipText:#0f172a;
-        --shadow:0 8px 22px rgba(15, 23, 42, 0.08);
-        --ring:0 0 0 3px rgba(15, 23, 42, 0.06);
+        --shadow:0 10px 26px rgba(15, 23, 42, 0.10);
+        --ring:0 0 0 3px rgba(15, 23, 42, 0.08);
+
+        /* prettier accents */
+        --gradA: rgba(15,23,42,0.10);
+        --gradB: rgba(15,23,42,0.02);
+        --okBg: rgba(6,95,70,0.08);
+        --warnBg: rgba(180,83,9,0.08);
+        --mutedBg: rgba(107,114,128,0.08);
       }
       html,body{height:100%}
       body{
@@ -61,78 +68,139 @@
       .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 
       /* =========================
-         Reasoning UI component
+         Reasoning UI (PRETTIER)
          ========================= */
       .reasoning-card{
         border:1px solid var(--border);
-        border-radius:14px;
+        border-radius:16px;
         padding:14px;
-        background:linear-gradient(180deg, #fff 0%, #fff 60%, #fbfdff 100%);
+        background:
+          radial-gradient(1200px 600px at 30% -10%, var(--gradA), transparent 55%),
+          radial-gradient(900px 500px at 100% 0%, rgba(99,102,241,0.10), transparent 55%),
+          linear-gradient(180deg, #ffffff 0%, #ffffff 65%, #fbfdff 100%);
         box-shadow:var(--shadow);
+        overflow:hidden;
+        position:relative;
       }
+      .reasoning-card:before{
+        content:"";
+        position:absolute;
+        inset:-1px;
+        border-radius:16px;
+        padding:1px;
+        background:linear-gradient(135deg, rgba(15,23,42,0.12), rgba(99,102,241,0.10), rgba(15,23,42,0.06));
+        -webkit-mask:
+          linear-gradient(#000 0 0) content-box,
+          linear-gradient(#000 0 0);
+        -webkit-mask-composite:xor;
+        mask-composite:exclude;
+        pointer-events:none;
+      }
+
       .reasoning-head{
         display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;
       }
-      .reasoning-title{
-        display:flex;align-items:center;gap:10px;
-      }
+      .reasoning-title{display:flex;align-items:center;gap:10px}
       .badge-dot{
-        width:10px;height:10px;border-radius:999px;background:var(--accent);
-        box-shadow:0 0 0 3px rgba(15,23,42,0.08);
+        width:12px;height:12px;border-radius:999px;
+        background:linear-gradient(180deg, rgba(15,23,42,1), rgba(99,102,241,0.9));
+        box-shadow:0 0 0 4px rgba(15,23,42,0.08);
       }
       .reasoning-title h3{margin:0;font-size:14px}
-      .reasoning-sub{
-        margin-top:3px;
-        font-size:12px;color:var(--muted);line-height:1.3;
-      }
-      .meta-row{
-        display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;
-      }
+      .reasoning-sub{margin-top:3px;font-size:12px;color:var(--muted);line-height:1.35}
+
+      .meta-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
       .chip{
-        display:inline-flex;align-items:center;gap:6px;
+        display:inline-flex;align-items:center;gap:8px;
         padding:6px 10px;border-radius:999px;
-        border:1px solid var(--border);background:var(--chip);
+        border:1px solid rgba(15,23,42,0.10);
+        background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(241,245,249,0.9));
         font-size:12px;color:var(--chipText);
+        box-shadow:0 1px 0 rgba(15,23,42,0.04);
       }
       .chip .k{color:var(--muted);font-weight:500}
-      .chip .v{font-weight:600}
+      .chip .v{font-weight:700}
+
       .panel{
-        border:1px solid var(--border);
-        border-radius:12px;
+        border:1px solid rgba(15,23,42,0.10);
+        border-radius:14px;
         padding:12px;
-        background:#fff;
+        background:rgba(255,255,255,0.92);
+        box-shadow:0 6px 18px rgba(15,23,42,0.06);
+        backdrop-filter:saturate(1.2) blur(6px);
       }
       .panel-header{
-        display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;
+        display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;
       }
       .panel-header .label{
-        font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+        font-size:11px;color:var(--muted);
+        text-transform:uppercase;letter-spacing:.12em;
       }
+
       .right-actions{display:flex;align-items:center;gap:8px}
       .icon-btn{
-        padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;
+        padding:7px 10px;border-radius:12px;
+        border:1px solid rgba(15,23,42,0.12);
+        background:linear-gradient(180deg, #fff, #f8fafc);
         font-size:12px;cursor:pointer;
+        box-shadow:0 1px 0 rgba(15,23,42,0.04);
       }
+      .icon-btn:hover{box-shadow:0 8px 18px rgba(15,23,42,0.08)}
       .icon-btn:focus{outline:none;box-shadow:var(--ring)}
+
+      .tag{
+        font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid rgba(15,23,42,0.12);
+        background:#fff;color:#111;
+      }
+      .tag.ok{border-color:rgba(6,95,70,0.25);background:var(--okBg);color:var(--good)}
+      .tag.warn{border-color:rgba(180,83,9,0.25);background:var(--warnBg);color:var(--warn)}
+      .tag.muted{background:var(--mutedBg);border-color:rgba(107,114,128,0.18);color:var(--muted)}
+
+      .kv{
+        display:grid;grid-template-columns: 140px 1fr;gap:8px 12px;
+        font-size:12px;
+      }
+      .kv .k{color:var(--muted)}
+      .kv .v{color:#111;min-width:0}
+
+      .divider{
+        height:1px;
+        background:linear-gradient(90deg, transparent, rgba(15,23,42,0.12), transparent);
+        margin:12px 0;
+      }
+
+      .progress{
+        height:10px;border-radius:999px;background:rgba(15,23,42,0.06);
+        overflow:hidden;border:1px solid rgba(15,23,42,0.10);
+      }
+      .progress > div{
+        height:100%;
+        width:0%;
+        background:linear-gradient(90deg, rgba(15,23,42,0.95), rgba(99,102,241,0.85));
+        border-radius:999px;
+        transition:width .35s ease;
+      }
+
       .timeline{
         position:relative;
-        padding-left:18px;
+        padding-left:22px;
       }
       .timeline:before{
         content:"";
-        position:absolute;left:7px;top:4px;bottom:6px;
-        width:2px;background:linear-gradient(180deg, rgba(15,23,42,0.18), rgba(15,23,42,0.06));
+        position:absolute;left:10px;top:2px;bottom:2px;
+        width:2px;background:linear-gradient(180deg, rgba(15,23,42,0.18), rgba(99,102,241,0.10), rgba(15,23,42,0.06));
         border-radius:999px;
       }
+
       details.step{
-        border:1px solid var(--border);
-        border-radius:12px;
+        border:1px solid rgba(15,23,42,0.10);
+        border-radius:14px;
         padding:10px 10px;
-        background:#fff;
+        background:linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.96));
         margin-bottom:10px;
-        box-shadow:0 1px 0 rgba(15,23,42,0.03);
+        box-shadow:0 6px 18px rgba(15,23,42,0.06);
       }
-      details.step[open]{box-shadow:0 6px 16px rgba(15,23,42,0.06)}
+      details.step[open]{box-shadow:0 10px 24px rgba(15,23,42,0.10)}
       summary.step-summary{
         list-style:none;
         cursor:pointer;
@@ -141,64 +209,61 @@
       summary.step-summary::-webkit-details-marker{display:none}
       .step-left{display:flex;align-items:center;gap:10px;min-width:0}
       .node{
-        width:12px;height:12px;border-radius:999px;background:#fff;border:2px solid rgba(15,23,42,0.25);
-        box-shadow:0 0 0 3px rgba(15,23,42,0.05);
+        width:14px;height:14px;border-radius:999px;background:#fff;border:2px solid rgba(15,23,42,0.22);
+        box-shadow:0 0 0 4px rgba(15,23,42,0.05);
         position:relative;
         flex:0 0 auto;
-        margin-left:-18px;
+        margin-left:-22px;
       }
       .node.ok{border-color:rgba(6,95,70,0.55)}
       .node.run{border-color:rgba(180,83,9,0.55)}
       .node.skip{border-color:rgba(107,114,128,0.45)}
+      .node.ok:after,.node.run:after,.node.skip:after{
+        content:"";
+        position:absolute;inset:3px;border-radius:999px;
+        background:rgba(15,23,42,0.06);
+      }
+      .node.ok:after{background:rgba(6,95,70,0.18)}
+      .node.run:after{background:rgba(180,83,9,0.18)}
+      .node.skip:after{background:rgba(107,114,128,0.16)}
+
       .step-name{
-        font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       }
       .step-desc{
         font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       }
       .step-meta{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-      .tag{
-        font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#fff;color:#111;
-      }
-      .tag.ok{border-color:rgba(6,95,70,0.25);background:rgba(6,95,70,0.06);color:var(--good)}
-      .tag.warn{border-color:rgba(180,83,9,0.25);background:rgba(180,83,9,0.06);color:var(--warn)}
-      .tag.muted{background:rgba(107,114,128,0.06);border-color:rgba(107,114,128,0.18);color:var(--muted)}
-      .step-body{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
-      .kv{
-        display:grid;grid-template-columns: 140px 1fr;gap:8px 10px;
-        font-size:12px;
-      }
-      .kv .k{color:var(--muted)}
-      .kv .v{color:#111;min-width:0}
+
+      .step-body{margin-top:10px;border-top:1px solid rgba(15,23,42,0.08);padding-top:10px}
+
       .pre{
         margin-top:10px;
-        background:var(--soft);
-        border:1px solid var(--border);
-        border-radius:12px;
+        background:linear-gradient(180deg, #0b1220 0%, #0b1220 100%);
+        border:1px solid rgba(148,163,184,0.25);
+        border-radius:14px;
         padding:10px;
         font-size:12px;
         overflow:auto;
         max-height:220px;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
       }
-      .pre code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+      .pre code{
+        font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+        color:#e5e7eb;
+      }
+
       .final{
         white-space:pre-wrap;
-        line-height:1.4;
+        line-height:1.5;
         font-size:12.5px;
         color:#0b1220;
       }
-      .progress{
-        height:10px;border-radius:999px;background:rgba(15,23,42,0.06);overflow:hidden;border:1px solid var(--border);
-      }
-      .progress > div{
-        height:100%;
-        width:0%;
-        background:linear-gradient(90deg, rgba(15,23,42,0.85), rgba(15,23,42,0.55));
-        border-radius:999px;
-        transition:width .35s ease;
-      }
-      .divider{height:1px;background:var(--border);margin:10px 0}
       .tiny{font-size:11px;color:var(--muted)}
+
+      /* small polish */
+      .panel + .panel { margin-top:12px; }
+      .panel-header .tiny{opacity:.9}
     </style>
   </head>
 
@@ -322,7 +387,7 @@
               <!-- Meta chips -->
               <div class="meta-row" id="traceMetaRow"></div>
 
-              <!-- Selected context (YOUR DATA) -->
+              <!-- Selected context -->
               <div class="panel" style="margin-top:12px">
                 <div class="panel-header">
                   <div class="label">Selected context</div>
@@ -350,7 +415,7 @@
               </div>
 
               <!-- Timeline -->
-              <div style="margin-top:12px" class="panel">
+              <div class="panel">
                 <div class="panel-header">
                   <div class="label">Timeline</div>
                   <div class="tiny" id="stepCountText">—</div>
@@ -359,7 +424,7 @@
               </div>
 
               <!-- Final output -->
-              <div style="margin-top:12px" class="panel">
+              <div class="panel">
                 <div class="panel-header">
                   <div class="label">Final output</div>
                   <span class="tag muted" id="finalTag">—</span>
@@ -406,7 +471,7 @@
       const refreshBtn = document.getElementById('refreshBtn');
       const statusText = document.getElementById('statusText');
 
-      // Selected context (new IDs)
+      // Selected context
       const ctxApp2 = document.getElementById('ctxApp2');
       const ctxSub2 = document.getElementById('ctxSub2');
       const ctxType2 = document.getElementById('ctxType2');
@@ -432,7 +497,7 @@
 
       const model = "llama3.1"; // matches your backend default
 
-      // Demo trace (shown only if backend does NOT return a trace)
+      // Demo trace (only used on first load if no real trace yet)
       const DEMO_TRACE = {
         "run_id": "1d3a7563-c7b3-4482-9891-55d46037dbce",
         "started_at": 1770353219.9745023,
@@ -585,6 +650,7 @@
         if (s === "ok" || s === "success") return { cls:"ok", txt:"ok" };
         if (s === "running") return { cls:"warn", txt:"running" };
         if (s === "skipped") return { cls:"muted", txt:"skipped" };
+        if (s === "failed" || s === "error") return { cls:"warn", txt:"failed" };
         if (!s) return { cls:"muted", txt:"—" };
         return { cls:"muted", txt:s };
       }
@@ -594,6 +660,7 @@
         if (s === "ok" || s === "success") return "node ok";
         if (s === "running") return "node run";
         if (s === "skipped") return "node skip";
+        if (s === "failed" || s === "error") return "node run";
         return "node";
       }
 
@@ -632,7 +699,7 @@
         chips.forEach(([k,v]) => {
           const el = document.createElement("span");
           el.className = "chip";
-          el.innerHTML = `<span class="k">${k}</span> <span class="v">${v}</span>`;
+          el.innerHTML = `<span class="k">${escapeHtml(k)}</span> <span class="v">${escapeHtml(v)}</span>`;
           traceMetaRow.appendChild(el);
         });
       }
@@ -641,7 +708,6 @@
         const steps = trace?.steps || [];
         const total = steps.length || 1;
 
-        // ok count (simple heuristic)
         const okish = steps.filter(s => {
           const st = String(s?.data?.status || "").toLowerCase();
           return st === "ok" || st === "success";
@@ -695,9 +761,6 @@
           right.className = "step-meta";
           right.innerHTML = `<span class="tag ${tag.cls}">${escapeHtml(tag.txt)}</span>`;
 
-          sum.appendChild(left);
-          sum.appendChild(right);
-
           const body = document.createElement("div");
           body.className = "step-body";
 
@@ -714,6 +777,9 @@
 
           body.appendChild(kv);
           body.appendChild(pre);
+
+          sum.appendChild(left);
+          sum.appendChild(right);
 
           details.appendChild(sum);
           details.appendChild(body);
@@ -760,12 +826,41 @@
         }
       });
 
+      // ===== Trace update fix (NEW) =====
+      let hasRealTrace = false;
+
+      function makePendingTrace(modeToUse) {
+        const now = Date.now() / 1000;
+        return {
+          run_id: "running…",
+          started_at: now,
+          ended_at: now,
+          steps: [
+            { name: "start", ts: now, data: { status: "running", summary: "Run started", mode: modeToUse, model, inputs: 1 } },
+            { name: "pending", ts: now + 0.01, data: { status: "running", summary: "Waiting for server response…" } }
+          ],
+          final_output: ""
+        };
+      }
+
+      function normalizeTrace(trace) {
+        if (!trace || typeof trace !== "object") return null;
+        if (!Array.isArray(trace.steps)) trace.steps = [];
+        return trace;
+      }
+
       // ===== Agent call (follows YOUR Flask routes) =====
       function generateAgentOutput(definition, force=false, modeOverride=null) {
         if (!definition || !definition.trim()) return;
 
         const genId = ++currentGenId;
         const modeToUse = modeOverride || modeSelect.value || "explain";
+
+        // Immediately show a "running" trace so timeline updates instantly
+        renderTrace(makePendingTrace(modeToUse));
+        finalOutputEl.textContent = "Running…";
+        finalTag.className = "tag warn";
+        finalTag.textContent = "running";
 
         ruleDesc.value = force ? "Regenerating..." : "Generating...";
         regenerateBtn.disabled = true;
@@ -778,11 +873,18 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mode: modeToUse, definition, model, force })
         })
-        .then(r => r.json())
+        .then(async (r) => {
+          let data = null;
+          try { data = await r.json(); } catch { data = {}; }
+          if (!r.ok) {
+            const msg = (data && (data.error || data.message)) ? (data.error || data.message) : `HTTP ${r.status}`;
+            throw new Error(msg);
+          }
+          return data;
+        })
         .then(data => {
           if (genId !== currentGenId) return;
 
-          // Your Flask currently returns { description: cleaned }
           const out = (data && data.description) ? String(data.description).trim() : '';
           ruleDesc.value = out;
 
@@ -790,19 +892,36 @@
 
           setStatus("Agent finished.", "ok");
 
-          // If you later return a trace from backend as { trace: {...} }, this will render it:
-          if (data && data.trace) {
-            renderTrace(data.trace);
-          } else {
-            // otherwise show demo trace so UI isn't empty
+          // Use the real trace if present; do NOT overwrite with demo after real traces exist
+          const trace = normalizeTrace(data?.trace);
+          if (trace) {
+            hasRealTrace = true;
+            renderTrace(trace);
+          } else if (!hasRealTrace) {
             renderTrace(DEMO_TRACE);
           }
         })
         .catch(err => {
           if (genId !== currentGenId) return;
           console.warn('Agent call failed:', err);
+
           ruleDesc.value = '';
           setStatus("Agent failed. Check server logs.", "warn");
+
+          // Show failure in trace UI (instead of demo)
+          const now = Date.now() / 1000;
+          renderTrace({
+            run_id: "failed",
+            started_at: now,
+            ended_at: now,
+            steps: [
+              { name: "error", ts: now, data: { status: "failed", summary: String(err?.message || err || "Unknown error") } }
+            ],
+            final_output: ""
+          });
+          finalOutputEl.textContent = String(err?.message || err || "Unknown error");
+          finalTag.className = "tag warn";
+          finalTag.textContent = "failed";
         })
         .finally(() => {
           regenerateBtn.disabled = false;
@@ -823,7 +942,7 @@
         selectCurrentRule();
       });
 
-      // Save description (YOUR route: POST /api/rules/<id>/description)
+      // Save description
       saveBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!selectedRule || !selectedRule.rule_id) {
@@ -854,20 +973,6 @@
         }
       });
 
-      // Run agent
-      agentBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (!ruleDef.value || !ruleDef.value.trim()) return;
-        generateAgentOutput(ruleDef.value, false, modeSelect.value);
-      });
-
-      // Force regenerate
-      regenerateBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (!ruleDef.value || !ruleDef.value.trim()) return;
-        generateAgentOutput(ruleDef.value, true, modeSelect.value);
-      });
-
       // Init
       (async function init() {
         await loadRulesFromServer();
@@ -875,6 +980,19 @@
         selectCurrentRule();
         renderTrace(DEMO_TRACE);
       })();
+
+      // Hook run/regenerate
+      document.getElementById('agentBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!ruleDef.value || !ruleDef.value.trim()) return;
+        generateAgentOutput(ruleDef.value, false, modeSelect.value);
+      });
+
+      document.getElementById('regenerateBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!ruleDef.value || !ruleDef.value.trim()) return;
+        generateAgentOutput(ruleDef.value, true, modeSelect.value);
+      });
     </script>
   </body>
 </html>

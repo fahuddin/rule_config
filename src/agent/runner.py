@@ -87,6 +87,7 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     rule_hash: str | None = None
     for step in steps:
         if step == "parse":
+            s = span()
             idx = len(extractions)
             if idx >= len(mvel_texts):
                 log(trace, "action:start", status="failed", span_id=s, summary="Parse MVEL", index=idx)
@@ -94,7 +95,6 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
 
             rule_hash = hash_text(mvel_texts[idx])
             extraction = parse_mvel_branches(mvel_texts[idx])
-            s = span()
             # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
@@ -207,4 +207,5 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
 
     trace.finish(english)
     trace.write()
-    return english
+    result = {'output': english, 'trace': trace.to_dict()}
+    return result
