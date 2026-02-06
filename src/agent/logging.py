@@ -1,6 +1,6 @@
 import uuid
 from typing import Any, Dict, List, Optional
-from tracing import Trace
+from agent.tracing import Trace
 
 
 def span() -> str:

@@ -16,7 +16,7 @@ from agent.agents.explainer import explain_rule
 from agent.agents.verifier import verify_explanation, rewrite_explanation
 from agent.agents.diff import diff_rules
 from agent.agents.tests import generate_tests
-from agent.logging import log
+from agent.logging import log, span
 from hashlib import sha256
 from agent.agents.redis_mini import MiniRedis
 import traceback
@@ -70,11 +70,11 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     
 
     trace = Trace(enabled=enable_trace)
-    trace.log_step("start", {"mode": mode, "model": model, "inputs": len(mvel_texts)})
+    log(trace, "start", summary="Run started", mode=mode, model=model, inputs=len(mvel_texts))
 
     # 2) Ask planner for the execution plan
     steps = plan_steps(mode)
-    trace.log_step("plan", {"steps": steps})
+    log(trace, "plan:set", summary="Plan created", goal=mode, steps=steps)
 
     # 3) Shared working state (short-term memory for this run)
     extractions: List[dict] = []
@@ -89,24 +89,28 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
         if step == "parse":
             idx = len(extractions)
             if idx >= len(mvel_texts):
-                trace.log_step("parse_skipped", {"reason": "no more inputs", "idx": idx})
+                log(trace, "action:start", status="failed", span_id=s, summary="Parse MVEL", index=idx)
                 continue
 
             rule_hash = hash_text(mvel_texts[idx])
             extraction = parse_mvel_branches(mvel_texts[idx])
-
+            s = span()
             # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
                 parsed = extraction
                 set_cached_parse(rule_hash, extraction)
+            log(trace, "parse", span_id=s, summary=f"Parsed rule {parsed}",
+                index=idx,
+                rule_hash=rule_hash,
+                branches=len(parsed.get("branches", [])),
+                outputs=parsed.get("outputs", []),
+                cache=parsed
+            )
             extractions.append(parsed)
-            
-            trace.log_step("parse", {
-                "index": idx,
-                "branches": len(extraction.get("branches", [])),
-                "outputs": extraction.get("outputs", []),
-            })
+
+                        
+            log(trace, "action:end", span_id=s, summary="Parse complete")
 
         elif step == "static_checks":
             if not extractions:
@@ -114,12 +118,15 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
             else:
                 static_issues = run_static_checks(extractions[-1])
 
-            trace.log_step("static_checks", {"issues": static_issues})
+            s = span()
+            log(trace, "action:start", status="static check", span_id=s, summary="static check")
 
         elif step == "retrieve_context":
             # Simple RAG + memory context
             # Uses first MVEL text as query signal (good enough for POC)
             rag = retrieve_context(mvel_texts[0] if mvel_texts else "", kb_dir="dir")
+            s = span()
+            log(trace, "action:start", status="running", span_id=s, summary="Retrieve context")
             pieces = []
             if mem_context:
                 pieces.append(mem_context)
@@ -129,41 +136,44 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                 pieces.append("Static check notes:\n" + "\n".join(f"- {x}" for x in static_issues))
 
             context = "\n\n".join(pieces).strip()
-            trace.log_step("retrieve_context", {"context_chars": len(context)})
+            
+            log(trace, "retrieve_context", span_id=s, summary="Context assembled", context_chars=len(context))
+            log(trace, "action:end", span_id=s, summary="Context retrieval complete")
 
         elif step == "explain":
             if not extractions:
                 english = "could not parse any rule branches from the provided MVEL."
-                trace.log_step("explain_fallback", {"reason": "no extraction"})
+                log(trace, "action:end", span_id=s, summary="english skipped because could not parse")
                 continue
 
             if rule_hash:
                 cached = get_cached_explanation(rule_hash)
                 if cached:
-                    trace.log_step("explain_cache_hit", {"rule_hash": rule_hash})
+                    log(trace, "explain", span_id=s, summary="Used cached explanation", english_chars=len(english), cache="hit")
                     # use cached explanation but continue pipeline so downstream steps can run
                     english = cached
                 else:
                     english = explain_rule(llm, extractions[-1], context)
                     set_cached_explanation(rule_hash, english)        
-            trace.log_step("explain", {"english_chars": len(english)})
-
+            log(trace, "explain", span_id=s, summary="Generated explanation", english_chars=len(english), cache="miss")
+            log(trace, "action:end", span_id=s, summary="Explain complete")
         elif step == "verify":
             if not extractions or not english:
                 verdict = {"ok": False, "missing": ["verify: missing extraction or english"], "rewrite_needed": True}
             else:
                 verdict = verify_explanation(llm, extractions[-1], english)
-
-            trace.log_step("verify", verdict)
+            log(trace, "verify", summary="Verification complete", **verdict)
 
         elif step == "rewrite":
             # Only rewrite if verifier says it's not OK
             if verdict.get("ok") is False and extractions and english:
                 english = rewrite_explanation(llm, extractions[-1], english, verdict.get("missing", []))
                 set_cached_explanation(rule_hash, english)
+                log(trace, "rewrite", summary="Rewrote explanation", english_chars=len(english))
                 trace.log_step("rewrite", {"english_chars": len(english)})
             else:
                 trace.log_step("rewrite_skipped", {"ok": verdict.get("ok", True)})
+                log(trace, "rewrite_skipped", status="skipped", summary="Rewrite not needed", ok=verdict.get("ok", True))
         elif step == "reflect":
             try:
                 refl = reflect(llm, extractions[-1], english)
