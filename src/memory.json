@@ -344,5 +344,125 @@
     "issues": [
       "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The condition in the first branch does not match: 'referenceFile.contains(transaction.referenceNumber)' vs 'null or length 3 or more input data'",
+      "Second branch is missing and has incorrect information: 'fourth element matches the value of the 'money' variable and the second element is empty'",
+      "DEFAULT branch is missing"
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The condition in the first branch does not match: 'referenceFile.contains(transaction.referenceNumber)' vs 'null or length 3 or more input data'",
+      "Second branch is missing and has incorrect information: 'fourth element matches the value of the 'money' variable and the second element is empty'",
+      "DEFAULT branch is missing"
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "MISSING_BRANCH",
+        "message": "Second branch mentioned in English explanation is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT branch is also missing from the English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
   }
 ]

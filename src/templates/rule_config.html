@@ -5,55 +5,230 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rule Maintenance</title>
     <style>
-      :root{--bg:#ffffff;--card:#ffffff;--accent:#0f172a;--muted:#6b7280;--border:#e5e7eb}
+      :root{
+        --bg:#ffffff;--card:#ffffff;--accent:#0f172a;--muted:#6b7280;--border:#e5e7eb;
+        --soft:#f8fafc;--warn:#b45309;--good:#065f46;
+
+        /* reasoning ui */
+        --chip:#f1f5f9;
+        --chipText:#0f172a;
+        --shadow:0 8px 22px rgba(15, 23, 42, 0.08);
+        --ring:0 0 0 3px rgba(15, 23, 42, 0.06);
+      }
       html,body{height:100%}
-      body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#000;display:flex;align-items:flex-start;justify-content:center;padding:32px}
-      .container{width:980px;max-width:96%}
-      .card{background:var(--card);border-radius:12px;padding:22px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid var(--border)}
+      body{
+        margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;
+        background:var(--bg);color:#000;display:flex;align-items:flex-start;justify-content:center;padding:32px
+      }
+      .container{width:1020px;max-width:96%}
+      .card{
+        background:var(--card);border-radius:12px;padding:22px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid var(--border)
+      }
       h1{margin:0 0 8px;font-size:20px}
       p.lead{margin:0 0 18px;color:var(--muted)}
-
       .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
       @media (max-width:920px){.grid{grid-template-columns:1fr}}
-
       .form-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}
       label.field{font-size:0.85rem;color:var(--muted);display:block;margin-bottom:6px}
-      select,input[type=text],textarea{padding:10px;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box}
-
+      select,input[type=text],textarea{
+        padding:10px;border:1px solid var(--border);border-radius:8px;width:100%;box-sizing:border-box;
+        background:#fff
+      }
+      textarea{resize:vertical}
       .section{background:#fff;padding:12px;border-radius:10px;border:1px solid var(--border)}
       .section h3{margin:0 0 8px;font-size:14px}
       .muted{color:var(--muted);font-size:0.9rem}
+      .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+      .pill{
+        display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;
+        border:1px solid var(--border);background:#fff;font-size:12px;color:#111
+      }
+      .pill strong{font-weight:600}
+      .footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;flex-wrap:wrap}
+      button{
+        padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+        background:#fff;cursor:pointer
+      }
+      button.primary{background:var(--accent);color:#fff;border-color:transparent}
+      button:disabled{opacity:.55;cursor:not-allowed}
+      .row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+      .hint{background:var(--soft);border:1px dashed var(--border);padding:10px;border-radius:10px}
+      .status{font-size:12px;color:var(--muted)}
+      .status.ok{color:var(--good)}
+      .status.warn{color:var(--warn)}
+      .small{font-size:12px}
+      .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 
-      .footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
-      button.primary{background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;border:0;cursor:pointer}
+      /* =========================
+         Reasoning UI component
+         ========================= */
+      .reasoning-card{
+        border:1px solid var(--border);
+        border-radius:14px;
+        padding:14px;
+        background:linear-gradient(180deg, #fff 0%, #fff 60%, #fbfdff 100%);
+        box-shadow:var(--shadow);
+      }
+      .reasoning-head{
+        display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;
+      }
+      .reasoning-title{
+        display:flex;align-items:center;gap:10px;
+      }
+      .badge-dot{
+        width:10px;height:10px;border-radius:999px;background:var(--accent);
+        box-shadow:0 0 0 3px rgba(15,23,42,0.08);
+      }
+      .reasoning-title h3{margin:0;font-size:14px}
+      .reasoning-sub{
+        margin-top:3px;
+        font-size:12px;color:var(--muted);line-height:1.3;
+      }
+      .meta-row{
+        display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;
+      }
+      .chip{
+        display:inline-flex;align-items:center;gap:6px;
+        padding:6px 10px;border-radius:999px;
+        border:1px solid var(--border);background:var(--chip);
+        font-size:12px;color:var(--chipText);
+      }
+      .chip .k{color:var(--muted);font-weight:500}
+      .chip .v{font-weight:600}
+      .panel{
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:12px;
+        background:#fff;
+      }
+      .panel-header{
+        display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;
+      }
+      .panel-header .label{
+        font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+      }
+      .right-actions{display:flex;align-items:center;gap:8px}
+      .icon-btn{
+        padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;
+        font-size:12px;cursor:pointer;
+      }
+      .icon-btn:focus{outline:none;box-shadow:var(--ring)}
+      .timeline{
+        position:relative;
+        padding-left:18px;
+      }
+      .timeline:before{
+        content:"";
+        position:absolute;left:7px;top:4px;bottom:6px;
+        width:2px;background:linear-gradient(180deg, rgba(15,23,42,0.18), rgba(15,23,42,0.06));
+        border-radius:999px;
+      }
+      details.step{
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:10px 10px;
+        background:#fff;
+        margin-bottom:10px;
+        box-shadow:0 1px 0 rgba(15,23,42,0.03);
+      }
+      details.step[open]{box-shadow:0 6px 16px rgba(15,23,42,0.06)}
+      summary.step-summary{
+        list-style:none;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:space-between;gap:10px;
+      }
+      summary.step-summary::-webkit-details-marker{display:none}
+      .step-left{display:flex;align-items:center;gap:10px;min-width:0}
+      .node{
+        width:12px;height:12px;border-radius:999px;background:#fff;border:2px solid rgba(15,23,42,0.25);
+        box-shadow:0 0 0 3px rgba(15,23,42,0.05);
+        position:relative;
+        flex:0 0 auto;
+        margin-left:-18px;
+      }
+      .node.ok{border-color:rgba(6,95,70,0.55)}
+      .node.run{border-color:rgba(180,83,9,0.55)}
+      .node.skip{border-color:rgba(107,114,128,0.45)}
+      .step-name{
+        font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      }
+      .step-desc{
+        font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      }
+      .step-meta{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+      .tag{
+        font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#fff;color:#111;
+      }
+      .tag.ok{border-color:rgba(6,95,70,0.25);background:rgba(6,95,70,0.06);color:var(--good)}
+      .tag.warn{border-color:rgba(180,83,9,0.25);background:rgba(180,83,9,0.06);color:var(--warn)}
+      .tag.muted{background:rgba(107,114,128,0.06);border-color:rgba(107,114,128,0.18);color:var(--muted)}
+      .step-body{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+      .kv{
+        display:grid;grid-template-columns: 140px 1fr;gap:8px 10px;
+        font-size:12px;
+      }
+      .kv .k{color:var(--muted)}
+      .kv .v{color:#111;min-width:0}
+      .pre{
+        margin-top:10px;
+        background:var(--soft);
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:10px;
+        font-size:12px;
+        overflow:auto;
+        max-height:220px;
+      }
+      .pre code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+      .final{
+        white-space:pre-wrap;
+        line-height:1.4;
+        font-size:12.5px;
+        color:#0b1220;
+      }
+      .progress{
+        height:10px;border-radius:999px;background:rgba(15,23,42,0.06);overflow:hidden;border:1px solid var(--border);
+      }
+      .progress > div{
+        height:100%;
+        width:0%;
+        background:linear-gradient(90deg, rgba(15,23,42,0.85), rgba(15,23,42,0.55));
+        border-radius:999px;
+        transition:width .35s ease;
+      }
+      .divider{height:1px;background:var(--border);margin:10px 0}
+      .tiny{font-size:11px;color:var(--muted)}
     </style>
   </head>
+
   <body>
     <div class="container">
       <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <h1 style="margin:0">Rule Maintenance</h1>
+        <div class="toolbar">
+          <div>
+            <h1 style="margin:0">Rule Maintenance</h1>
+            <p class="lead">Browse rules from Redis, edit details, and run agent modes to generate outputs.</p>
+          </div>
+          <div class="row-actions">
+            <span class="pill"><strong>API</strong> <span class="mono">/api/rules</span></span>
+            <button id="refreshBtn" title="Reload from server">Refresh</button>
+          </div>
         </div>
-        <p class="lead">Select application/module, rule type and name to edit rule details.</p>
 
         <div class="grid">
+          <!-- LEFT -->
           <div>
             <div class="section">
               <h3>Application / Module</h3>
               <div class="form-row">
                 <div>
                   <label class="field">Application</label>
-                  <select id="appSelect">
-                    <option value="IFL">IFL</option>
-                  </select>
+                  <select id="appSelect"></select>
                 </div>
                 <div>
                   <label class="field">Sub-module</label>
-                  <select id="subSelect">
-                    <option value="Cash">Cash</option>
-                    <option value="Payment">Payment</option>
-                    <option value="Transfer">Transfer</option>
-                  </select>
+                  <select id="subSelect"></select>
                 </div>
               </div>
 
@@ -61,15 +236,11 @@
               <div class="form-row">
                 <div>
                   <label class="field">Rule Type</label>
-                  <select id="typeSelect">
-                    <option value="ReferenceFileValidation">ReferenceFileValidation</option>
-                    <option value="AccountsValidation">AccountsValidation</option>
-                  </select>
+                  <select id="typeSelect"></select>
                 </div>
                 <div>
                   <label class="field">Rule Name</label>
-                  <select id="ruleSelect">
-                  </select>
+                  <select id="ruleSelect"></select>
                 </div>
               </div>
             </div>
@@ -77,52 +248,139 @@
             <div style="margin-top:12px" class="section">
               <h3>Rule Details</h3>
 
-              <!-- NEW: Mode dropdown -->
-              <div style="margin-bottom:12px">
-                <label class="field">Mode</label>
-                <select id="modeSelect">
-                  <option value="explain">explain</option>
-                  <option value="verify">verify</option>
-                  <option value="tests">tests</option>
-                  <option value="diff">diff</option>
-                </select>
+              <div class="form-row" style="grid-template-columns:1fr 1fr">
+                <div>
+                  <label class="field">Rule ID</label>
+                  <input id="ruleId" type="text" disabled />
+                </div>
+                <div>
+                  <label class="field">Rule Name</label>
+                  <input id="ruleName" type="text" disabled />
+                </div>
               </div>
 
               <div style="margin-bottom:8px">
                 <label class="field">Rule Definition</label>
-                <textarea id="ruleDef" rows="6" placeholder="Enter or edit rule definition"></textarea>
+                <textarea id="ruleDef" rows="7" placeholder="Rule definition (MVEL / expression)"></textarea>
               </div>
-              <div>
-                <label class="field">Rule Description</label>
-                <textarea id="ruleDesc" rows="3" placeholder="Friendly description of the rule"></textarea>
+
+              <div style="margin-bottom:8px">
+                <label class="field">Rule Description / Output</label>
+                <textarea id="ruleDesc" rows="4" placeholder="Agent output or saved description"></textarea>
               </div>
 
               <div class="footer">
-                <div class="muted">Changes are local in this demo.</div>
                 <div>
-                  <button class="primary" id="saveBtn">Save</button>
-                  <button id="regenerateBtn" style="margin-left:8px">Regenerate</button>
+                  <div class="status" id="statusText">Ready.</div>
+                  <div class="small muted">
+                    Save writes only <span class="mono">rule_desc</span> via
+                    <span class="mono">POST /api/rules/&lt;id&gt;/description</span>.
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <button class="primary" id="saveBtn">Save Description</button>
+
+                  <div style="min-width:180px">
+                    <label class="field" style="margin-bottom:6px">Agent mode</label>
+                    <select id="modeSelect">
+                      <option value="explain">explain</option>
+                      <option value="diff">diff</option>
+                      <option value="verify">verify</option>
+                      <option value="tests">tests</option>
+                    </select>
+                  </div>
+
+                  <button id="agentBtn">Run Agent</button>
+                  <button id="regenerateBtn" title="Force regenerate (no cache)">Regenerate</button>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- RIGHT -->
           <div>
-            <div class="section">
-              <h3>Selected Context</h3>
-              <div style="margin-top:8px">
-                <p><strong>Application:</strong> <span id="ctxApp">IFL</span></p>
-                <p><strong>Sub-module:</strong> <span id="ctxSub">Cash</span></p>
-                <p><strong>Rule Type:</strong> <span id="ctxType">ReferenceFileValidation</span></p>
-                <p><strong>Rule Name:</strong> <span id="ctxName">-</span></p>
-                <!-- NEW: Mode in context -->
-                <p><strong>Mode:</strong> <span id="ctxMode">explain</span></p>
+            <!-- Reasoning UI + Selected Context -->
+            <div class="reasoning-card section" style="padding:14px">
+              <div class="reasoning-head">
+                <div class="reasoning-title">
+                  <span class="badge-dot" aria-hidden="true"></span>
+                  <div>
+                    <h3 style="margin:0">Reasoning Trace</h3>
+                    <div class="reasoning-sub">
+                      Timeline + metadata for the latest agent run. Selected context is shown here too.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="right-actions">
+                  <button class="icon-btn" id="toggleAllBtn" title="Expand/collapse all">Expand all</button>
+                  <button class="icon-btn" id="copyFinalBtn" title="Copy final output">Copy final</button>
+                </div>
+              </div>
+
+              <!-- Meta chips -->
+              <div class="meta-row" id="traceMetaRow"></div>
+
+              <!-- Selected context (YOUR DATA) -->
+              <div class="panel" style="margin-top:12px">
+                <div class="panel-header">
+                  <div class="label">Selected context</div>
+                  <span class="tag muted" id="ctxStatusPill">—</span>
+                </div>
+
+                <div class="kv" style="grid-template-columns: 120px 1fr">
+                  <div class="k">Application</div><div class="v" id="ctxApp2">-</div>
+                  <div class="k">Sub-module</div><div class="v" id="ctxSub2">-</div>
+                  <div class="k">Rule Type</div><div class="v" id="ctxType2">-</div>
+                  <div class="k">Rule Name</div><div class="v" id="ctxName2">-</div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <!-- Progress -->
+              <div class="panel">
+                <div class="panel-header">
+                  <div class="label">Run progress</div>
+                  <div class="tiny" id="runDurationText">—</div>
+                </div>
+                <div class="progress" aria-label="run progress"><div id="progressBar"></div></div>
+                <div class="tiny" style="margin-top:8px" id="runSummaryText">—</div>
+              </div>
+
+              <!-- Timeline -->
+              <div style="margin-top:12px" class="panel">
+                <div class="panel-header">
+                  <div class="label">Timeline</div>
+                  <div class="tiny" id="stepCountText">—</div>
+                </div>
+                <div class="timeline" id="timeline"></div>
+              </div>
+
+              <!-- Final output -->
+              <div style="margin-top:12px" class="panel">
+                <div class="panel-header">
+                  <div class="label">Final output</div>
+                  <span class="tag muted" id="finalTag">—</span>
+                </div>
+                <div class="final" id="finalOutput">No trace loaded.</div>
               </div>
             </div>
 
+            <!-- Agent Modes -->
             <div style="margin-top:12px" class="section">
-              <h3>Help</h3>
-              <div class="muted">Rule lists are filtered by the selected Rule Type. Edit definition and description, then click Save.</div>
+              <h3>Agent Modes</h3>
+              <div class="hint muted">
+                <div><strong>explain</strong>: user-friendly description of the rule.</div>
+                <div style="margin-top:6px"><strong>diff</strong>: highlight changes between current vs saved (if your agent supports it).</div>
+                <div style="margin-top:6px"><strong>verify</strong>: sanity-check and return issues/suggestions.</div>
+                <div style="margin-top:6px"><strong>tests</strong>: propose test cases for the rule.</div>
+                <div style="margin-top:10px" class="small">
+                  Calls <span class="mono">POST /api/generate-description</span> with JSON
+                  <span class="mono">{ definition, model, force, mode }</span>.
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -131,28 +389,78 @@
 
     <script>
       // Elements
-      const typeSelect = document.getElementById('typeSelect');
-      const ruleSelect = document.getElementById('ruleSelect');
-      const ctxApp = document.getElementById('ctxApp');
-      const ctxSub = document.getElementById('ctxSub');
-      const ctxType = document.getElementById('ctxType');
-      const ctxName = document.getElementById('ctxName');
-      const ctxMode = document.getElementById('ctxMode'); // NEW
       const appSelect = document.getElementById('appSelect');
       const subSelect = document.getElementById('subSelect');
+      const typeSelect = document.getElementById('typeSelect');
+      const ruleSelect = document.getElementById('ruleSelect');
+
+      const ruleId = document.getElementById('ruleId');
+      const ruleName = document.getElementById('ruleName');
       const ruleDef = document.getElementById('ruleDef');
       const ruleDesc = document.getElementById('ruleDesc');
+
+      const modeSelect = document.getElementById('modeSelect');
       const saveBtn = document.getElementById('saveBtn');
       const regenerateBtn = document.getElementById('regenerateBtn');
-      const modeSelect = document.getElementById('modeSelect'); // NEW
+      const agentBtn = document.getElementById('agentBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const statusText = document.getElementById('statusText');
 
-      // Local cache of Redis rules
-      let allRules = [];           // array of objects from /api/rules
-      let selectedRule = null;     // currently selected rule object
-      let currentGenId = 0;        // prevent race-condition updates
+      // Selected context (new IDs)
+      const ctxApp2 = document.getElementById('ctxApp2');
+      const ctxSub2 = document.getElementById('ctxSub2');
+      const ctxType2 = document.getElementById('ctxType2');
+      const ctxName2 = document.getElementById('ctxName2');
+      const ctxStatusPill = document.getElementById('ctxStatusPill');
+
+      // Reasoning UI elements
+      const traceMetaRow = document.getElementById('traceMetaRow');
+      const timelineEl = document.getElementById('timeline');
+      const finalOutputEl = document.getElementById('finalOutput');
+      const progressBarEl = document.getElementById('progressBar');
+      const runDurationText = document.getElementById('runDurationText');
+      const runSummaryText = document.getElementById('runSummaryText');
+      const stepCountText = document.getElementById('stepCountText');
+      const finalTag = document.getElementById('finalTag');
+      const toggleAllBtn = document.getElementById('toggleAllBtn');
+      const copyFinalBtn = document.getElementById('copyFinalBtn');
+
+      // Data
+      let allRules = [];
+      let selectedRule = null;
+      let currentGenId = 0;
+
+      const model = "llama3.1"; // matches your backend default
+
+      // Demo trace (shown only if backend does NOT return a trace)
+      const DEMO_TRACE = {
+        "run_id": "1d3a7563-c7b3-4482-9891-55d46037dbce",
+        "started_at": 1770353219.9745023,
+        "ended_at": 1770353248.9037688,
+        "steps": [
+          { "name":"start","ts":1770353219.9745092,"data":{"status":"ok","summary":"Run started","mode":"explain","model":"llama3.1","inputs":1}},
+          { "name":"plan:set","ts":1770353219.9745152,"data":{"status":"ok","summary":"Plan created","goal":"explain","steps":["parse","retrieve_context","explain","reflect","rewrite"]}},
+          { "name":"parse","ts":1770353219.9827738,"data":{"status":"ok","summary":"Parsed rule ...","span_id":"ce2a1e31-63dc-4736-8a43-38af6840ee31","rule_hash":"19f44e...","branches":1,"outputs":[]}},
+          { "name":"action:end","ts":1770353219.9827778,"data":{"status":"ok","summary":"Parse complete","span_id":"ce2a1e31-63dc-4736-8a43-38af6840ee31"}},
+          { "name":"action:start","ts":1770353219.9840477,"data":{"status":"running","summary":"Retrieve context","span_id":"d21f70f8-30eb-4034-8243-818cfe414bb5"}},
+          { "name":"retrieve_context","ts":1770353219.9840517,"data":{"status":"ok","summary":"Context assembled","span_id":"d21f70f8-30eb-4034-8243-818cfe414bb5","context_chars":22095}},
+          { "name":"action:end","ts":1770353219.9840536,"data":{"status":"ok","summary":"Context retrieval complete","span_id":"d21f70f8-30eb-4034-8243-818cfe414bb5"}},
+          { "name":"explain","ts":1770353240.4733486,"data":{"status":"ok","summary":"Generated explanation","span_id":"d21f70f8-30eb-4034-8243-818cfe414bb5","english_chars":1377,"cache":"miss"}},
+          { "name":"action:end","ts":1770353240.4733531,"data":{"status":"ok","summary":"Explain complete","span_id":"d21f70f8-30eb-4034-8243-818cfe414bb5"}},
+          { "name":"reflect","ts":1770353248.8878334,"data":{"issues":3}},
+          { "name":"rewrite_skipped","ts":1770353248.9034898,"data":{"ok":true}},
+          { "name":"rewrite_skipped","ts":1770353248.9034965,"data":{"status":"skipped","summary":"Rewrite not needed","ok":true}}
+        ],
+        "final_output":"(demo) final output…"
+      };
 
       // Helpers
       const uniq = (arr) => [...new Set(arr.filter(v => String(v || '').trim() !== ''))];
+
+      function setStatus(msg, kind="") {
+        statusText.className = "status " + (kind || "");
+        statusText.textContent = msg;
+      }
 
       function setOptions(selectEl, values, preferredValue = null) {
         selectEl.innerHTML = '';
@@ -170,11 +478,21 @@
       }
 
       function updateContext() {
-        ctxApp.textContent = appSelect.value || '-';
-        ctxSub.textContent = subSelect.value || '-';
-        ctxType.textContent = typeSelect.value || '-';
-        ctxName.textContent = ruleSelect.value || '-';
-        if (ctxMode) ctxMode.textContent = (modeSelect && modeSelect.value) ? modeSelect.value : '-'; // NEW
+        const app = appSelect.value || '-';
+        const sub = subSelect.value || '-';
+        const typ = typeSelect.value || '-';
+        const nam = ruleSelect.value || '-';
+
+        if (ctxApp2) ctxApp2.textContent = app;
+        if (ctxSub2) ctxSub2.textContent = sub;
+        if (ctxType2) ctxType2.textContent = typ;
+        if (ctxName2) ctxName2.textContent = nam;
+
+        if (ctxStatusPill) {
+          const ok = !!(selectedRule && selectedRule.rule_id);
+          ctxStatusPill.className = "tag " + (ok ? "ok" : "muted");
+          ctxStatusPill.textContent = ok ? "loaded" : "none";
+        }
       }
 
       function getFilteredRules() {
@@ -194,25 +512,21 @@
         const prevType = typeSelect.value;
         const prevName = ruleSelect.value;
 
-        // Applications
         const apps = uniq(allRules.map(r => r.application));
         setOptions(appSelect, apps, prevApp);
 
-        // Sub-modules for selected application
         const subs = uniq(allRules
           .filter(r => r.application === appSelect.value)
           .map(r => r.sub_module)
         );
         setOptions(subSelect, subs, prevSub);
 
-        // Rule types for selected app/sub
         const types = uniq(allRules
           .filter(r => r.application === appSelect.value && r.sub_module === subSelect.value)
           .map(r => r.rule_type)
         );
         setOptions(typeSelect, types, prevType);
 
-        // Rule names for selected app/sub/type
         const names = uniq(getFilteredRules().map(r => r.rule_name));
         setOptions(ruleSelect, names, prevName);
 
@@ -225,92 +539,291 @@
         selectedRule = candidates.find(r => r.rule_name === name) || null;
 
         if (!selectedRule) {
+          ruleId.value = '';
+          ruleName.value = '';
           ruleDef.value = '';
           ruleDesc.value = '';
           updateContext();
+          setStatus("No rule selected.", "warn");
           return;
         }
 
-        // Populate from Redis fields
+        ruleId.value = selectedRule.rule_id || '';
+        ruleName.value = selectedRule.rule_name || '';
         ruleDef.value = selectedRule.rule_def || '';
-        ruleDesc.value = selectedRule.rule_desc || ''; // if you store it in Redis
+        ruleDesc.value = selectedRule.rule_desc || '';
+
         updateContext();
+        setStatus("Loaded rule from Redis.", "ok");
 
         // Auto-generate description if missing
         if (ruleDef.value.trim() && !ruleDesc.value.trim()) {
-          generateDescription(ruleDef.value, false);
+          generateAgentOutput(ruleDef.value, false, "explain");
         }
       }
 
-      function generateDescription(definition, force=false) {
+      async function loadRulesFromServer() {
+        setStatus("Loading rules...", "");
+        const res = await fetch('/api/rules');
+        const data = await res.json();
+        allRules = (data && data.rules) ? data.rules : [];
+        setStatus(`Loaded ${allRules.length} rules.`, "ok");
+      }
+
+      // ===== Reasoning UI rendering =====
+      function fmtSeconds(s) {
+        if (!isFinite(s)) return "—";
+        if (s < 1) return `${Math.round(s*1000)}ms`;
+        if (s < 60) return `${s.toFixed(2)}s`;
+        const m = Math.floor(s/60);
+        const r = (s - m*60);
+        return `${m}m ${r.toFixed(0)}s`;
+      }
+
+      function statusTag(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "ok" || s === "success") return { cls:"ok", txt:"ok" };
+        if (s === "running") return { cls:"warn", txt:"running" };
+        if (s === "skipped") return { cls:"muted", txt:"skipped" };
+        if (!s) return { cls:"muted", txt:"—" };
+        return { cls:"muted", txt:s };
+      }
+
+      function nodeClass(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "ok" || s === "success") return "node ok";
+        if (s === "running") return "node run";
+        if (s === "skipped") return "node skip";
+        return "node";
+      }
+
+      function safeJson(obj) {
+        try { return JSON.stringify(obj, null, 2); } catch { return String(obj); }
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function buildMetaChips(trace) {
+        traceMetaRow.innerHTML = "";
+
+        const started = trace?.started_at;
+        const ended = trace?.ended_at;
+        const dur = (isFinite(started) && isFinite(ended)) ? (ended - started) : NaN;
+
+        const first = (trace?.steps || [])[0]?.data || {};
+        const mode = first.mode || "—";
+        const modelName = first.model || "—";
+
+        const chips = [
+          ["Run", trace?.run_id ? String(trace.run_id).slice(0, 8) + "…" : "—"],
+          ["Mode", mode],
+          ["Model", modelName],
+          ["Steps", (trace?.steps || []).length],
+          ["Duration", fmtSeconds(dur)]
+        ];
+
+        chips.forEach(([k,v]) => {
+          const el = document.createElement("span");
+          el.className = "chip";
+          el.innerHTML = `<span class="k">${k}</span> <span class="v">${v}</span>`;
+          traceMetaRow.appendChild(el);
+        });
+      }
+
+      function buildProgress(trace) {
+        const steps = trace?.steps || [];
+        const total = steps.length || 1;
+
+        // ok count (simple heuristic)
+        const okish = steps.filter(s => {
+          const st = String(s?.data?.status || "").toLowerCase();
+          return st === "ok" || st === "success";
+        }).length;
+
+        const pct = Math.max(0, Math.min(100, Math.round((okish / total) * 100)));
+        progressBarEl.style.width = pct + "%";
+
+        const started = trace?.started_at;
+        const ended = trace?.ended_at;
+        const dur = (isFinite(started) && isFinite(ended)) ? (ended - started) : NaN;
+
+        runDurationText.textContent = `Duration: ${fmtSeconds(dur)}`;
+
+        const startSummary = steps[0]?.data?.summary ? `Start: ${steps[0].data.summary}` : "—";
+        const reflect = steps.find(s => s?.name === "reflect");
+        const issues = reflect?.data?.issues != null ? ` • Issues: ${reflect.data.issues}` : "";
+        runSummaryText.textContent = startSummary + issues;
+      }
+
+      function buildTimeline(trace) {
+        const steps = trace?.steps || [];
+        stepCountText.textContent = `${steps.length} step${steps.length === 1 ? "" : "s"}`;
+        timelineEl.innerHTML = "";
+
+        steps.forEach((s, idx) => {
+          const name = s?.name ?? `step_${idx}`;
+          const data = s?.data || {};
+          const summary = data.summary || "";
+          const tag = statusTag(data.status ?? (data.ok === true ? "ok" : data.ok === false ? "warn" : ""));
+          const node = nodeClass(data.status ?? (data.ok === true ? "ok" : data.ok === false ? "warn" : ""));
+
+          const details = document.createElement("details");
+          details.className = "step";
+          details.open = idx < 2;
+
+          const sum = document.createElement("summary");
+          sum.className = "step-summary";
+
+          const left = document.createElement("div");
+          left.className = "step-left";
+          left.innerHTML = `
+            <span class="${node}" aria-hidden="true"></span>
+            <div style="min-width:0">
+              <div class="step-name">${escapeHtml(name)}</div>
+              <div class="step-desc">${escapeHtml(summary || "—")}</div>
+            </div>
+          `;
+
+          const right = document.createElement("div");
+          right.className = "step-meta";
+          right.innerHTML = `<span class="tag ${tag.cls}">${escapeHtml(tag.txt)}</span>`;
+
+          sum.appendChild(left);
+          sum.appendChild(right);
+
+          const body = document.createElement("div");
+          body.className = "step-body";
+
+          const kv = document.createElement("div");
+          kv.className = "kv";
+          kv.innerHTML = `
+            <div class="k">timestamp</div><div class="v">${escapeHtml(String(s.ts ?? "—"))}</div>
+            <div class="k">summary</div><div class="v">${escapeHtml(summary || "—")}</div>
+          `;
+
+          const pre = document.createElement("div");
+          pre.className = "pre";
+          pre.innerHTML = `<code>${escapeHtml(safeJson(data))}</code>`;
+
+          body.appendChild(kv);
+          body.appendChild(pre);
+
+          details.appendChild(sum);
+          details.appendChild(body);
+
+          timelineEl.appendChild(details);
+        });
+      }
+
+      function renderTrace(trace) {
+        if (!trace) return;
+
+        buildMetaChips(trace);
+        buildProgress(trace);
+        buildTimeline(trace);
+
+        const out = (trace.final_output || trace.output || "").trim();
+        finalOutputEl.textContent = out || "—";
+
+        const last = (trace.steps || []).slice().reverse().find(s => s?.data?.status || s?.data?.ok != null);
+        const st = last?.data?.status ?? (last?.data?.ok === true ? "ok" : last?.data?.ok === false ? "warn" : "—");
+        const tg = statusTag(st);
+
+        finalTag.className = `tag ${tg.cls}`;
+        finalTag.textContent = tg.txt;
+      }
+
+      // UI actions
+      let allExpanded = false;
+      toggleAllBtn.addEventListener("click", () => {
+        const nodes = timelineEl.querySelectorAll("details.step");
+        allExpanded = !allExpanded;
+        nodes.forEach(d => d.open = allExpanded);
+        toggleAllBtn.textContent = allExpanded ? "Collapse all" : "Expand all";
+      });
+
+      copyFinalBtn.addEventListener("click", async () => {
+        const text = finalOutputEl.textContent || "";
+        try {
+          await navigator.clipboard.writeText(text);
+          copyFinalBtn.textContent = "Copied!";
+          setTimeout(() => (copyFinalBtn.textContent = "Copy final"), 900);
+        } catch {
+          alert("Copy failed (clipboard not available).");
+        }
+      });
+
+      // ===== Agent call (follows YOUR Flask routes) =====
+      function generateAgentOutput(definition, force=false, modeOverride=null) {
         if (!definition || !definition.trim()) return;
 
-        const mode = modeSelect ? modeSelect.value : 'explain'; // NEW
-
         const genId = ++currentGenId;
-        ruleDesc.value = force ? 'Regenerating description...' : 'Generating description...';
-        regenerateBtn.disabled = true;
+        const modeToUse = modeOverride || modeSelect.value || "explain";
 
-        fetch('/api/generate-description', {
+        ruleDesc.value = force ? "Regenerating..." : "Generating...";
+        regenerateBtn.disabled = true;
+        agentBtn.disabled = true;
+
+        setStatus(`Agent running in "${modeToUse}" mode...`, "");
+
+        fetch(`/api/generate-description`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ definition, force, mode }) // NEW
+          body: JSON.stringify({ mode: modeToUse, definition, model, force })
         })
         .then(r => r.json())
         .then(data => {
           if (genId !== currentGenId) return;
-          const desc = (data && data.description) ? data.description.trim() : '';
-          ruleDesc.value = desc;
 
-          // keep local cache in sync
-          if (selectedRule) selectedRule.rule_desc = desc;
+          // Your Flask currently returns { description: cleaned }
+          const out = (data && data.description) ? String(data.description).trim() : '';
+          ruleDesc.value = out;
+
+          if (selectedRule) selectedRule.rule_desc = out;
+
+          setStatus("Agent finished.", "ok");
+
+          // If you later return a trace from backend as { trace: {...} }, this will render it:
+          if (data && data.trace) {
+            renderTrace(data.trace);
+          } else {
+            // otherwise show demo trace so UI isn't empty
+            renderTrace(DEMO_TRACE);
+          }
         })
         .catch(err => {
           if (genId !== currentGenId) return;
-          console.warn('LLM description fetch failed:', err);
+          console.warn('Agent call failed:', err);
           ruleDesc.value = '';
+          setStatus("Agent failed. Check server logs.", "warn");
         })
         .finally(() => {
           regenerateBtn.disabled = false;
+          agentBtn.disabled = false;
         });
       }
 
-      async function loadRulesFromServer() {
-        const res = await fetch('/api/rules');
-        const data = await res.json();
-        allRules = (data && data.rules) ? data.rules : [];
-      }
+      // Events: selectors
+      appSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
+      subSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
+      typeSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
+      ruleSelect.addEventListener('change', () => { selectCurrentRule(); });
 
-      // Event listeners
-      appSelect.addEventListener('change', () => {
+      // Refresh
+      refreshBtn.addEventListener('click', async () => {
+        await loadRulesFromServer();
         repopulateSelectors();
         selectCurrentRule();
       });
 
-      subSelect.addEventListener('change', () => {
-        repopulateSelectors();
-        selectCurrentRule();
-      });
-
-      typeSelect.addEventListener('change', () => {
-        repopulateSelectors();
-        selectCurrentRule();
-      });
-
-      ruleSelect.addEventListener('change', () => {
-        selectCurrentRule();
-      });
-
-      // NEW: mode changes update context (optional: auto-regenerate if you want)
-      if (modeSelect) {
-        modeSelect.addEventListener('change', () => {
-          updateContext();
-          // Optional behavior:
-          // if (ruleDef.value.trim()) generateDescription(ruleDef.value, true);
-        });
-      }
-
-      // Save: write description back to Redis (requires backend endpoint)
+      // Save description (YOUR route: POST /api/rules/<id>/description)
       saveBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         if (!selectedRule || !selectedRule.rule_id) {
@@ -318,30 +831,41 @@
           return;
         }
 
-        const payload = {
-          description: ruleDesc.value || '',
-          mode: modeSelect ? modeSelect.value : 'explain' // OPTIONAL (safe to include)
-        };
+        const desc = (ruleDesc.value || '').trim();
+        if (!desc) {
+          alert('Description/output is empty.');
+          return;
+        }
 
-        // This endpoint must exist on Flask (see note below)
-        const resp = await fetch(`/api/rules/${selectedRule.rule_id}/description`, {
+        setStatus("Saving description...", "");
+        const resp = await fetch(`/api/rules/${encodeURIComponent(selectedRule.rule_id)}/description`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ description: desc })
         });
 
         if (resp.ok) {
-          alert('Saved to Redis.');
+          setStatus("Saved to Redis.", "ok");
+          selectedRule.rule_desc = desc;
         } else {
           const err = await resp.json().catch(() => ({}));
+          setStatus("Save failed.", "warn");
           alert('Save failed: ' + (err.error || resp.status));
         }
       });
 
+      // Run agent
+      agentBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!ruleDef.value || !ruleDef.value.trim()) return;
+        generateAgentOutput(ruleDef.value, false, modeSelect.value);
+      });
+
+      // Force regenerate
       regenerateBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (!ruleDef.value || !ruleDef.value.trim()) return;
-        generateDescription(ruleDef.value, true);
+        generateAgentOutput(ruleDef.value, true, modeSelect.value);
       });
 
       // Init
@@ -349,6 +873,7 @@
         await loadRulesFromServer();
         repopulateSelectors();
         selectCurrentRule();
+        renderTrace(DEMO_TRACE);
       })();
     </script>
   </body>
