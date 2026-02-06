@@ -16,6 +16,7 @@ from agent.agents.explainer import explain_rule
 from agent.agents.verifier import verify_explanation, rewrite_explanation
 from agent.agents.diff import diff_rules
 from agent.agents.tests import generate_tests
+from agent.logging import log
 from hashlib import sha256
 from agent.agents.redis_mini import MiniRedis
 import traceback
@@ -97,6 +98,7 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
             # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
+                parsed = extraction
                 set_cached_parse(rule_hash, extraction)
             extractions.append(parsed)
             
@@ -141,15 +143,10 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                     trace.log_step("explain_cache_hit", {"rule_hash": rule_hash})
                     # use cached explanation but continue pipeline so downstream steps can run
                     english = cached
-
-            english = explain_rule(llm, extractions[-1], context)
-
-            if rule_hash:
-                set_cached_explanation(rule_hash, english)
-
+                else:
+                    english = explain_rule(llm, extractions[-1], context)
+                    set_cached_explanation(rule_hash, english)        
             trace.log_step("explain", {"english_chars": len(english)})
-
-            
 
         elif step == "verify":
             if not extractions or not english:
