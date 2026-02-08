@@ -821,5 +821,240 @@
         "message": "DEFAULT/else branch is missing."
       }
     ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "The English explanation does not fully match the rule extraction. The explanation mentions a series of error messages and warnings, but the rule extraction details actual conditions and variables."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "Lack of context or information about the rule extraction process itself."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction.",
+      "The explanation mentions a list of error messages and warnings, but the rule extraction only contains one branch condition and actions.",
+      "The explanation also asks for clarification on specific information regarding the rule extraction, but the provided rule extraction details are already clear and complete."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not mention the condition 'transaction.countLastMinute > threshold' which is present in the rule extraction.",
+      "The English explanation does not mention any of the variables extracted, such as 'Transaction', 'VELOCITY_EXCEEDED', etc."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction.",
+      "The explanation mentions a list of error messages and warnings, but the rule extraction only contains one branch condition and actions.",
+      "The explanation asks for clarification on specific information regarding the rule extraction, but the provided rule extraction details are clear and complete."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. It mentions a series of error messages and warnings, but the rule extraction only contains one branch condition and actions."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction"
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not present in the rule extraction"
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction"
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction"
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction"
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not present in the rule extraction"
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "EXPLANATION_INACCURACY",
+        "message": "The English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "The explanation lacks context or information about the rule extraction process itself."
+      },
+      {
+        "code": "INCONSISTENT_VARIABLES",
+        "message": "The English explanation does not mention some of the variables extracted, such as 'Transaction', 'VELOCITY_EXCEEDED', etc."
+      },
+      {
+        "code": "MISSING_CONDITIONS",
+        "message": "The condition 'transaction.countLastMinute > threshold' present in the rule extraction is missing from the English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "EXPLANATION_INACCURACY",
+        "message": "The English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "The explanation lacks context or information about the rule extraction process itself."
+      },
+      {
+        "code": "INCONSISTENT_VARIABLES",
+        "message": "The English explanation does not mention some of the variables extracted, such as 'Transaction', 'VELOCITY_EXCEEDED', etc."
+      },
+      {
+        "code": "MISSING_CONDITIONS",
+        "message": "The condition 'transaction.countLastMinute > threshold' present in the rule extraction is not included in the English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "EXPLANATION_INACCURACY",
+        "message": "The English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "The explanation lacks context or information about the rule extraction process itself."
+      }
+    ]
   }
 ]

@@ -1,7 +1,7 @@
 # agent/runner.py
 import json
 from typing import List
-
+import hashlib
 from agent.agents.reflect import reflect
 from agent.llm import get_llm
 from agent.memory import load_memory, format_context_from_memory,save_memory_item
@@ -39,12 +39,17 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     # 1) Initialize shared resources
     llm = get_llm(model=model, temperature=0.0)  # deterministic
     mem = load_memory() #load user settings and domain mapping and reflection
-    mem_context = format_context_from_memory(mem) 
+    
+   
+    mem_context = format_context_from_memory({
+        "profile": mem.get("profile"),
+        "mappings": mem.get("mappings")
+    })
     
     redis_client = MiniRedis(host="127.0.0.1", port=6379)
 
     def hash_text(text: str) -> str:
-        return sha256(text.encode("utf-8")).hexdigest()
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
     
     def get_cached_explanation(rule_hash: str) -> str | None:
         key = f"mvel:cache:explain:{rule_hash}"
@@ -88,20 +93,15 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     for step in steps:
         if step == "parse":
             s = span()
-            idx = len(extractions)
-            if idx >= len(mvel_texts):
-                log(trace, "action:start", status="failed", span_id=s, summary="Parse MVEL", index=idx)
-                continue
-
-            rule_hash = hash_text(mvel_texts[idx])
-            extraction = parse_mvel_branches(mvel_texts[idx])
+            rule_hash = hash_text(mvel_texts[0])
+            extraction = parse_mvel_branches(mvel_texts[0])
             # parse cache
             parsed = get_cached_parse(rule_hash)
             if parsed is None:
                 parsed = extraction
                 set_cached_parse(rule_hash, extraction)
             log(trace, "parse", span_id=s, summary=f"Parsed rule {parsed}",
-                index=idx,
+                index=0,
                 rule_hash=rule_hash,
                 branches=len(parsed.get("branches", [])),
                 outputs=parsed.get("outputs", []),
@@ -154,6 +154,7 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
                     english = cached
                 else:
                     english = explain_rule(llm, extractions[-1], context)
+                    log(trace, "explain", span_id=s, summary="{english}")
                     set_cached_explanation(rule_hash, english)        
             log(trace, "explain", span_id=s, summary="Generated explanation", english_chars=len(english), cache="miss")
             log(trace, "action:end", span_id=s, summary="Explain complete")

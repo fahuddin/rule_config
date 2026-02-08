@@ -1,0 +1,38 @@
+{
+  "run_id": "fb262d59-47c4-48b1-9818-e182ae5654a1",
+  "started_at": 1770588864.7775016,
+  "ended_at": 1770588864.778216,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1770588864.7775161,
+      "data": {
+        "status": "ok",
+        "summary": "Run started",
+        "mode": "explain",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan:set",
+      "ts": 1770588864.7775247,
+      "data": {
+        "status": "ok",
+        "summary": "Plan created",
+        "goal": "explain",
+        "steps": [
+          "parse, retrieve_context, explain"
+        ]
+      }
+    },
+    {
+      "name": "unknown_step",
+      "ts": 1770588864.7775307,
+      "data": {
+        "step": "parse, retrieve_context, explain"
+      }
+    }
+  ],
+  "final_output": "No output was produced. Check the plan and earlier steps."
+}

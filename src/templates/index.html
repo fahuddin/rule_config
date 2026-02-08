@@ -277,7 +277,6 @@
           </div>
           <div class="row-actions">
             <span class="pill"><strong>API</strong> <span class="mono">/api/rules</span></span>
-            <button id="refreshBtn" title="Reload from server">Refresh</button>
           </div>
         </div>
 
@@ -356,7 +355,6 @@
                     </select>
                   </div>
 
-                  <button id="agentBtn">Run Agent</button>
                   <button id="regenerateBtn" title="Force regenerate (no cache)">Regenerate</button>
                 </div>
               </div>
@@ -467,8 +465,6 @@
       const modeSelect = document.getElementById('modeSelect');
       const saveBtn = document.getElementById('saveBtn');
       const regenerateBtn = document.getElementById('regenerateBtn');
-      const agentBtn = document.getElementById('agentBtn');
-      const refreshBtn = document.getElementById('refreshBtn');
       const statusText = document.getElementById('statusText');
 
       // Selected context
@@ -620,11 +616,6 @@
 
         updateContext();
         setStatus("Loaded rule from Redis.", "ok");
-
-        // Auto-generate description if missing
-        if (ruleDef.value.trim() && !ruleDesc.value.trim()) {
-          generateAgentOutput(ruleDef.value, false, "explain");
-        }
       }
 
       async function loadRulesFromServer() {
@@ -826,7 +817,7 @@
         }
       });
 
-      // ===== Trace update fix (NEW) =====
+      // ===== Trace update fix =====
       let hasRealTrace = false;
 
       function makePendingTrace(modeToUse) {
@@ -849,24 +840,24 @@
         return trace;
       }
 
-      // ===== Agent call (follows YOUR Flask routes) =====
-      function generateAgentOutput(definition, force=false, modeOverride=null) {
-        if (!definition || !definition.trim()) return;
+      // ===== Only action: regenerate =====
+      function regenerate() {
+        const definition = ruleDef.value || "";
+        if (!definition.trim()) return;
 
         const genId = ++currentGenId;
-        const modeToUse = modeOverride || modeSelect.value || "explain";
+        const modeToUse = modeSelect.value || "explain";
+        const force = true;
 
-        // Immediately show a "running" trace so timeline updates instantly
         renderTrace(makePendingTrace(modeToUse));
         finalOutputEl.textContent = "Running…";
         finalTag.className = "tag warn";
         finalTag.textContent = "running";
 
-        ruleDesc.value = force ? "Regenerating..." : "Generating...";
+        ruleDesc.value = "Regenerating...";
         regenerateBtn.disabled = true;
-        agentBtn.disabled = true;
 
-        setStatus(`Agent running in "${modeToUse}" mode...`, "");
+        setStatus(`Regenerating in "${modeToUse}" mode...`, "");
 
         fetch(`/api/generate-description`, {
           method: 'POST',
@@ -890,9 +881,8 @@
 
           if (selectedRule) selectedRule.rule_desc = out;
 
-          setStatus("Agent finished.", "ok");
+          setStatus("Done.", "ok");
 
-          // Use the real trace if present; do NOT overwrite with demo after real traces exist
           const trace = normalizeTrace(data?.trace);
           if (trace) {
             hasRealTrace = true;
@@ -903,12 +893,11 @@
         })
         .catch(err => {
           if (genId !== currentGenId) return;
-          console.warn('Agent call failed:', err);
 
+          console.warn('Regenerate failed:', err);
           ruleDesc.value = '';
-          setStatus("Agent failed. Check server logs.", "warn");
+          setStatus("Regenerate failed. Check server logs.", "warn");
 
-          // Show failure in trace UI (instead of demo)
           const now = Date.now() / 1000;
           renderTrace({
             run_id: "failed",
@@ -925,7 +914,6 @@
         })
         .finally(() => {
           regenerateBtn.disabled = false;
-          agentBtn.disabled = false;
         });
       }
 
@@ -934,13 +922,6 @@
       subSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
       typeSelect.addEventListener('change', () => { repopulateSelectors(); selectCurrentRule(); });
       ruleSelect.addEventListener('change', () => { selectCurrentRule(); });
-
-      // Refresh
-      refreshBtn.addEventListener('click', async () => {
-        await loadRulesFromServer();
-        repopulateSelectors();
-        selectCurrentRule();
-      });
 
       // Save description
       saveBtn.addEventListener('click', async (e) => {
@@ -981,17 +962,10 @@
         renderTrace(DEMO_TRACE);
       })();
 
-      // Hook run/regenerate
-      document.getElementById('agentBtn').addEventListener('click', (e) => {
+      // Hook regenerate (only)
+      regenerateBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (!ruleDef.value || !ruleDef.value.trim()) return;
-        generateAgentOutput(ruleDef.value, false, modeSelect.value);
-      });
-
-      document.getElementById('regenerateBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        if (!ruleDef.value || !ruleDef.value.trim()) return;
-        generateAgentOutput(ruleDef.value, true, modeSelect.value);
+        regenerate();
       });
     </script>
   </body>
