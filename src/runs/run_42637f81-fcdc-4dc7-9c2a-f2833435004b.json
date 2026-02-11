@@ -1,0 +1,152 @@
+{
+  "run_id": "42637f81-fcdc-4dc7-9c2a-f2833435004b",
+  "started_at": 1770592028.4979737,
+  "ended_at": 1770592046.8133798,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1770592028.4979818,
+      "data": {
+        "status": "ok",
+        "summary": "Run started",
+        "mode": "explain",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan:set",
+      "ts": 1770592028.497987,
+      "data": {
+        "status": "ok",
+        "summary": "Plan created",
+        "goal": "explain",
+        "steps": [
+          "parse",
+          "retrieve_context",
+          "explain"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1770592028.5269241,
+      "data": {
+        "status": "ok",
+        "summary": "Parsed rule {'globals': ['return true'], 'branches': [{'condition': 'order == null || order.total == null) { errorCode = \"MISSING_ORDER\"; errorMessage = \"Order information is missing\"; return false; } if (order.total <= 0) { errorCode = \"INVALID_TOTAL\"; errorMessage = \"Order total must be greater than zero\"; return false; } if (order.currency == null || !allowedCurrencies.contains(order.currency)) { errorCode = \"UNSUPPORTED_CURRENCY\"; errorMessage = \"Order currency is not supported\"; return false; } if (order.customerId == null || order.customerId.trim().length() == 0', 'actions': ['errorCode = \"MISSING_ORDER\"', 'errorMessage = \"Order information is missing\"', 'return false', '} if (order.total <= 0) { errorCode = \"INVALID_TOTAL\"', 'errorMessage = \"Order total must be greater than zero\"', 'return false', '} if (order.currency == null || !allowedCurrencies.contains(order.currency)) { errorCode = \"UNSUPPORTED_CURRENCY\"', 'errorMessage = \"Order currency is not supported\"', 'return false', '} if (order.customerId == null || order.customerId.trim().length() == 0) { errorCode = \"MISSING_CUSTOMER\"', 'errorMessage = \"Customer information is required\"', 'return false']}], 'variables': ['allowedCurrencies.contains', 'length', 'order', 'order.currency', 'order.customerId', 'order.customerId.trim', 'order.total'], 'outputs': ['errorCode', 'errorMessage']}",
+        "span_id": "c93a0bff-32d2-403c-bf0a-8a9267954247",
+        "index": 0,
+        "rule_hash": "f227b64c29d07daad1bd1ac020be5d606cdeba5cf26b167a6bae2bbe60c312d7",
+        "branches": 1,
+        "outputs": [
+          "errorCode",
+          "errorMessage"
+        ],
+        "cache": {
+          "globals": [
+            "return true"
+          ],
+          "branches": [
+            {
+              "condition": "order == null || order.total == null) { errorCode = \"MISSING_ORDER\"; errorMessage = \"Order information is missing\"; return false; } if (order.total <= 0) { errorCode = \"INVALID_TOTAL\"; errorMessage = \"Order total must be greater than zero\"; return false; } if (order.currency == null || !allowedCurrencies.contains(order.currency)) { errorCode = \"UNSUPPORTED_CURRENCY\"; errorMessage = \"Order currency is not supported\"; return false; } if (order.customerId == null || order.customerId.trim().length() == 0",
+              "actions": [
+                "errorCode = \"MISSING_ORDER\"",
+                "errorMessage = \"Order information is missing\"",
+                "return false",
+                "} if (order.total <= 0) { errorCode = \"INVALID_TOTAL\"",
+                "errorMessage = \"Order total must be greater than zero\"",
+                "return false",
+                "} if (order.currency == null || !allowedCurrencies.contains(order.currency)) { errorCode = \"UNSUPPORTED_CURRENCY\"",
+                "errorMessage = \"Order currency is not supported\"",
+                "return false",
+                "} if (order.customerId == null || order.customerId.trim().length() == 0) { errorCode = \"MISSING_CUSTOMER\"",
+                "errorMessage = \"Customer information is required\"",
+                "return false"
+              ]
+            }
+          ],
+          "variables": [
+            "allowedCurrencies.contains",
+            "length",
+            "order",
+            "order.currency",
+            "order.customerId",
+            "order.customerId.trim",
+            "order.total"
+          ],
+          "outputs": [
+            "errorCode",
+            "errorMessage"
+          ]
+        }
+      }
+    },
+    {
+      "name": "action:end",
+      "ts": 1770592028.5269284,
+      "data": {
+        "status": "ok",
+        "summary": "Parse complete",
+        "span_id": "c93a0bff-32d2-403c-bf0a-8a9267954247"
+      }
+    },
+    {
+      "name": "action:start",
+      "ts": 1770592028.5279412,
+      "data": {
+        "status": "running",
+        "summary": "Retrieve context",
+        "span_id": "d6876dcf-53b2-4164-92ae-5c46b0221d68"
+      }
+    },
+    {
+      "name": "retrieve_context",
+      "ts": 1770592028.5279467,
+      "data": {
+        "status": "ok",
+        "summary": "Context assembled",
+        "span_id": "d6876dcf-53b2-4164-92ae-5c46b0221d68",
+        "context_chars": 36
+      }
+    },
+    {
+      "name": "action:end",
+      "ts": 1770592028.5279489,
+      "data": {
+        "status": "ok",
+        "summary": "Context retrieval complete",
+        "span_id": "d6876dcf-53b2-4164-92ae-5c46b0221d68"
+      }
+    },
+    {
+      "name": "explain",
+      "ts": 1770592046.8097923,
+      "data": {
+        "status": "ok",
+        "summary": "{english}",
+        "span_id": "d6876dcf-53b2-4164-92ae-5c46b0221d68"
+      }
+    },
+    {
+      "name": "explain",
+      "ts": 1770592046.8131,
+      "data": {
+        "status": "ok",
+        "summary": "Generated explanation",
+        "span_id": "d6876dcf-53b2-4164-92ae-5c46b0221d68",
+        "english_chars": 902,
+        "cache": "miss"
+      }
+    },
+    {
+      "name": "action:end",
+      "ts": 1770592046.8131044,
+      "data": {
+        "status": "ok",
+        "summary": "Explain complete",
+        "span_id": "d6876dcf-53b2-4164-92ae-5c46b0221d68"
+      }
+    }
+  ],
+  "final_output": "**Summary**\n\nThis rule checks if an order is valid before processing it. It verifies that the order has necessary information, a supported currency, and a total greater than zero.\n\n**Decision Logic**\n\n* If the order is missing or its total is unknown, return an error with code \"MISSING_ORDER\" and message \"Order information is missing\".\n* If the order's total is not greater than zero, return an error with code \"INVALID_TOTAL\" and message \"Order total must be greater than zero\".\n* If the order's currency is not supported (i.e., it's not in the list of allowed currencies), return an error with code \"UNSUPPORTED_CURRENCY\" and message \"Order currency is not supported\".\n* If the customer information is missing, return an error with code \"MISSING_CUSTOMER\" and message \"Customer information is required\".\n\nNote: The rule assumes that `allowedCurrencies` is a predefined list of supported currencies."
+}
