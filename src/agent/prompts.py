@@ -57,7 +57,7 @@ EXPLAIN_PROMPT = ChatPromptTemplate.from_messages([
         "- Use 'Otherwise,' for the DEFAULT branch\n"
         "- Use provided context to define business terms if relevant\n\n"
         "Context:\n"
-        "{context}\n\n"
+        "{context}\n\n"     
         "Rule extraction (JSON):\n"
         "{extraction_json}"
     )

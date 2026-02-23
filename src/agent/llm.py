@@ -16,3 +16,4 @@ def get_llm(model: str, temperature: float = 0.0) -> ChatOllama:
     # ChatOllama will talk to the local Ollama server (default: http://localhost:11434)
     # No API keys needed.
     return ChatOllama(model=model, temperature=temperature)
+

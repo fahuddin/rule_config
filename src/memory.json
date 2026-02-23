@@ -240,31 +240,36 @@
   {
     "type": "reflection_issue",
     "issues": [
-      "The English explanation does not fully match the rule extraction. The condition in the second point is incorrect, it should be '!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2])' instead of 'data[3].equalsIgnoreCase(money) && (stringhelper.isEmpty(data[2]))'."
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
       {
         "code": "EXPLANATION_MISMATCH",
         "message": "The English explanation does not fully match the rule extraction.",
         "details": [
-          "In the English explanation, Branch 1 has a condition of `data == null || data.length <= 3`, but in the rule extraction, it is `data == null || data.length < 4`."
-        ]
-      },
-      {
-        "code": "EXPLANATION_MISMATCH",
-        "message": "The English explanation does not fully match the rule extraction.",
-        "details": [
-          "In the English explanation, Branch 2 has a condition of `stringhelper.isEmpty(data[3])`, but in the rule extraction, it is `stringhelper.isEmpty(data[3])` with an open parenthesis missing."
-        ]
-      },
-      {
-        "code": "EXPLANATION_MISMATCH",
-        "message": "The English explanation does not fully match the rule extraction.",
-        "details": [
-          "In the English explanation, the DEFAULT branch has a condition of `!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2])`, but in the rule extraction, it is `!data[3].equalsIgnoreCase(money) && !stringhelper.isEmpty(data[2])`."
+          {
+            "location": "English explanation, Branch 1: Condition",
+            "expected": "data == null || data.length <= 3",
+            "actual": "If the input data is null or has a length of 3 or less"
+          },
+          {
+            "location": "English explanation, Branch 2: Condition",
+            "expected": "stringhelper.isEmpty(data[3])",
+            "actual": "If the fourth element in the input data array is empty"
+          },
+          {
+            "location": "English explanation, DEFAULT branch: Conditions",
+            "expected": "!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2])",
+            "actual": "The fourth element in the input data array does not match the value of the `money` variable and the second element in the input data array is not empty"
+          },
+          {
+            "location": "English explanation, DEFAULT branch: Actions",
+            "expected": [
+              "output.getValidContextSetting().setTerminateFurther(true)",
+              "Return MVELoutput"
+            ],
+            "actual": [
+              "Set `output.getValidContextSetting().setTerminateFurther(true)`",
+              "Return `MVELoutput`"
+            ]
+          }
         ]
       }
     ]
@@ -272,8 +277,9 @@
   {
     "type": "reflection_issue",
     "issues": [
-      "The English explanation does not fully match the rule extraction. Specifically, the DEFAULT Branch is incorrectly described as having two conditions and actions when it actually only has one condition and no actions.",
-      "The English explanation mentions that if the input data does not meet these conditions, it sets a flag to terminate further rule execution and returns an output. However, this is not explicitly stated in the rule extraction for the DEFAULT Branch."
+      "The English explanation does not match the rule extraction. The rule extraction has no condition for checking the length of the input data array, but the English explanation mentions it.",
+      "The English explanation mentions a condition to check if the fourth element in the input data array (data[3]) matches the value of the 'money' variable, which is not present in the rule extraction.",
+      "The English explanation also mentions a condition to check if the second element in the input data array (data[2]) is not empty, but this is not present in the rule extraction."
     ]
   },
   {
@@ -281,199 +287,23 @@
     "issues": [
       {
         "code": "MISMATCH",
-        "message": "English explanation does not fully match rule extraction"
+        "message": "The English explanation does not fully match the rule extraction."
       },
       {
         "code": "MISMATCH",
-        "message": "DEFAULT Branch has only one condition and no actions, contrary to English explanation"
-      }
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      "The English explanation incorrectly states that Branch 1 checks if the input data is null or has a length of less than 4. The actual rule extraction shows that it checks if the input data is not null and the third element is not empty.",
-      "The English explanation incorrectly states that Branch 2 checks if the fourth element in the input data array matches the value of the 'money' variable and the second element is empty. The actual rule extraction shows that it checks if the fourth element equals the 'money' variable and the second element is empty, but with an extra closing parenthesis.",
-      "The English explanation incorrectly states that the DEFAULT branch has actions to set a flag to terminate further rule execution and return an output. The actual rule extraction shows that the DEFAULT branch only sets a flag to terminate further rule execution."
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      "The English explanation does not fully match the rule extraction: In the first branch, it should be 'data[3].equalsIgnoreCase(money)' instead of 'its fourth element (data[3]) does not match the value of the 'money' variable'.",
-      "The English explanation does not fully match the rule extraction: The second condition in the first branch is missing. It should be 'if the second element (data[2]) is not empty'."
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      {
-        "code": "MISMATCH_CONDITION_BRANCH_1",
-        "message": "The condition in Branch 1 is missing an opening parenthesis."
+        "message": "The rule extraction has a single branch, but the English explanation mentions two branches (Branch 1 and Branch 2) and a DEFAULT branch."
       },
       {
-        "code": "MISMATCH_CONDITION_DEFAULT",
-        "message": "The DEFAULT branch has a condition of !data[3].equalsIgnoreCase(money) && !stringhelper.isEmpty(data[2]) which is different from what's mentioned in the English explanation (!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2]))."
+        "code": "MISMATCH",
+        "message": "The condition in the first branch of the English explanation is not present in the rule extraction. The rule extraction checks if a reference number exists in a reference file, but the English explanation mentions checking for null or length 3 or more input data."
       },
       {
-        "code": "MISMATCH_ACTIONS_DEFAULT",
-        "message": "The DEFAULT branch has only one condition and no actions, contrary to what's stated in the English explanation."
+        "code": "MISMATCH",
+        "message": "The second branch mentioned in the English explanation does not exist in the rule extraction. It also incorrectly states that the fourth element matches the value of the 'money' variable and the second element is empty, which are not present in the rule extraction."
       },
       {
-        "code": "MISMATCH_CONDITION_BRANCH_1",
-        "message": "The first branch checks if the input data is not null and the third element is not empty (data != null && (!stringhelper.isEmpty(data[3])) which is different from what's mentioned in the English explanation (data == null || data.length <= 3)."
-      },
-      {
-        "code": "MISMATCH_CONDITION_BRANCH_2",
-        "message": "The second branch checks if the fourth element equals the 'money' variable and the second element is empty, but with an extra closing parenthesis."
-      },
-      {
-        "code": "MISMATCH_ACTIONS_DEFAULT",
-        "message": "The DEFAULT branch only sets a flag to terminate further rule execution, which is different from what's stated in the English explanation."
-      }
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "The condition in Branch 1 is missing an opening parenthesis.",
-        "location": {
-          "line": 0,
-          "column": 0
-        }
-      },
-      {
-        "code": "CONDITION_MISMATCH",
-        "message": "The first branch checks if the input data is not null and the third element is not empty, which is different from what's mentioned in the English explanation (data == null || data.length <= 3).",
-        "location": {
-          "line": 0,
-          "column": 0
-        }
-      },
-      {
-        "code": "CONDITION_MISMATCH",
-        "message": "The second branch checks if the fourth element equals the 'money' variable and the second element is empty, but with an extra closing parenthesis.",
-        "location": {
-          "line": 0,
-          "column": 0
-        }
-      },
-      {
-        "code": "ACTION_MISMATCH",
-        "message": "The DEFAULT branch only sets a flag to terminate further rule execution, which is different from what's stated in the English explanation.",
-        "location": {
-          "line": 0,
-          "column": 0
-        }
-      }
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "The first branch condition is incorrect. It should be 'data != null && !stringhelper.isEmpty(data[3])' instead of 'input data is null or has a length of less than 4'."
-      },
-      {
-        "code": "MISSING_CONDITION",
-        "message": "The second condition in the first branch is missing from the English explanation. It should be 'if the second element (data[2]) is not empty'."
-      },
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "The DEFAULT branch condition is incorrect. It should be '!data[3].equalsIgnoreCase(money) && !stringhelper.isEmpty(data[2])' instead of '!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2]))'."
-      },
-      {
-        "code": "MISMATCH_ACTION",
-        "message": "The DEFAULT branch action is incorrect. It should be 'output.getValidContextSetting().setTerminateFurther(true)' instead of 'only sets a flag to terminate further rule execution'."
-      },
-      {
-        "code": "MISSING_PARENTHESIS",
-        "message": "The condition in Branch 1 is missing an opening parenthesis."
-      }
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      {
-        "code": "EXPLANATION_MISMATCH",
-        "message": "English explanation does not match rule extraction for Branch 1 condition"
-      },
-      {
-        "code": "EXPLANATION_MISMATCH",
-        "message": "English explanation does not match rule extraction for Branch 2 condition"
-      },
-      {
-        "code": "EXPLANATION_MISMATCH",
-        "message": "English explanation does not match rule extraction for DEFAULT branch condition"
-      },
-      {
-        "code": "ACTION_MISMATCH",
-        "message": "English explanation does not match rule extraction for DEFAULT branch actions"
-      }
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      {
-        "code": "EXPLANATION_MISMATCH",
-        "message": "English explanation does not match rule extraction"
-      },
-      {
-        "code": "MISMATCH_CONDITION_BRANCH_1",
-        "message": "Condition in English explanation for Branch 1 does not match the condition in rule extraction. Expected: referenceFile.contains(transaction.referenceNumber), Actual: input data is null or has a length of less than 4"
-      },
-      {
-        "code": "MISSING_CONDITION",
-        "message": "Second condition in Branch 1 is missing from English explanation. Expected: if the second element (data[2]) is not empty"
-      },
-      {
-        "code": "MISMATCH_CONDITION_BRANCH_2",
-        "message": "Condition in English explanation for Branch 2 does not match the condition in rule extraction. Expected: stringhelper.isEmpty(data[3]), Actual: its fourth element (data[3]) does not match the value of the 'money' variable"
-      },
-      {
-        "code": "MISMATCH_ACTIONS_DEFAULT",
-        "message": "Action in English explanation for DEFAULT branch does not match the action in rule extraction. Expected: output.getValidContextSetting().setTerminateFurther(true), Actual: only sets a flag to terminate further rule execution"
-      }
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      "English explanation does not match rule extraction for Branch 1 Condition.",
-      "English explanation does not match rule extraction for Branch 2 Condition.",
-      "English explanation does not match rule extraction for DEFAULT Branch Condition.",
-      "English explanation does not match rule extraction for DEFAULT Branch Actions."
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      "The English explanation does not match the rule extraction. The JSON contains a decision table or rules engine configuration, but it does not contain any specific rules or conditions to evaluate."
-    ]
-  },
-  {
-    "type": "reflection_issue",
-    "issues": [
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "English explanation mismatch: Branch 1 condition should be 'transaction.accountNumber == null || transaction.accountNumber.trim().length() < 10' instead of 'null or length less than 4'."
-      },
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "English explanation mismatch: Branch 2 condition should be 'stringhelper.isEmpty(data[3])' instead of 'fourth element equals money and second element is empty'."
-      },
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "English explanation mismatch: DEFAULT branch condition should be '!data[3].equalsIgnoreCase(money) && !stringhelper.isEmpty(data[2])' instead of '!data[3].equalsIgnoreCase(money) || !stringhelper.isEmpty(data[2])'."
-      },
-      {
-        "code": "MISMATCH_ACTIONS",
-        "message": "English explanation mismatch: DEFAULT branch actions should be 'output.getValidContextSetting().setTerminateFurther(true)' instead of 'set flag to terminate further rule execution and return an output'."
+        "code": "MISMATCH",
+        "message": "The DEFAULT branch mentioned in the English explanation does not exist in the rule extraction. The rule extraction has no actions for any condition, but the English explanation states that it takes certain actions if none of the conditions are met."
       }
     ]
   },
@@ -482,15 +312,11 @@
     "issues": [
       {
         "code": "MISMATCH",
-        "message": "English explanation does not fully match rule extraction"
+        "message": "English explanation does not fully match the rule extraction: The English explanation mentions a DEFAULT branch with no specific condition checked, but this is not present in the rule extraction."
       },
       {
-        "code": "INCONSISTENT_CONDITIONS",
-        "message": "Branch conditions do not match between English explanation and rule extraction"
-      },
-      {
-        "code": "ACTION_MISMATCH",
-        "message": "Action in DEFAULT branch does not match between English explanation and rule extraction"
+        "code": "INCOMPLETE",
+        "message": "The rule extraction does not contain a DEFAULT/else branch, which may indicate that the rule relies on fallthrough behavior or is partial."
       }
     ]
   },
@@ -498,54 +324,93 @@
     "type": "reflection_issue",
     "issues": [
       {
-        "type": "EXPLANATION_MISMATCH",
-        "message": "The condition in Branch 1 does not match between the English explanation and the rule extraction (expected: `referenceFile.contains(transaction.referenceNumber)`, actual: `input data is null or has a length of less than 4`)"
+        "code": "MISMATCH",
+        "message": "The English explanation incorrectly mentions a DEFAULT branch that is not present in the rule extraction."
       },
       {
-        "type": "MISSING_CONDITION",
-        "message": "The second condition in Branch 1 is missing from the English explanation."
-      },
-      {
-        "type": "EXPLANATION_MISMATCH",
-        "message": "The condition in Branch 2 does not match between the English explanation and the rule extraction (expected: `stringhelper.isEmpty(data[3])`, actual: `its fourth element (data[3]) does not match the value of the 'money' variable`)"
-      },
-      {
-        "type": "ACTION_MISMATCH",
-        "message": "The action in the DEFAULT branch does not match between the English explanation and the rule extraction (expected: `output.getValidContextSetting().setTerminateFurther(true)`, actual: `only sets a flag to terminate further rule execution`)"
+        "code": "INCOMPLETE",
+        "message": "The English explanation does not fully explain the purpose of the rule, it only describes one branch and its condition."
       }
     ]
   },
   {
     "type": "reflection_issue",
     "issues": [
-      "The condition in Branch 1 does not match between the English explanation and the rule extraction.",
-      "The second condition in Branch 1 is missing from the English explanation.",
-      "The condition in Branch 2 does not match between the English explanation and the rule extraction.",
-      "The action in the DEFAULT branch does not match between the English explanation and the rule extraction."
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The condition in the first branch does not match: 'referenceFile.contains(transaction.referenceNumber)' vs 'null or length 3 or more input data'",
+      "Second branch is missing and has incorrect information: 'fourth element matches the value of the 'money' variable and the second element is empty'",
+      "DEFAULT branch is missing"
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The condition in the first branch does not match: 'referenceFile.contains(transaction.referenceNumber)' vs 'null or length 3 or more input data'",
+      "Second branch is missing and has incorrect information: 'fourth element matches the value of the 'money' variable and the second element is empty'",
+      "DEFAULT branch is missing"
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not accurately reflect the rule extraction. It mentions checking if a reference number exists in a reference file, but the condition is actually 'referenceFile.contains(transaction.referenceNumber)', which implies that the reference number must be present in the reference file for the condition to be true."
     ]
   },
   {
     "type": "reflection_issue",
     "issues": [
       {
-        "code": "MISMATCH_CONDITION",
-        "message": "The condition in Branch 1 does not match between the English explanation and the rule extraction."
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
       },
       {
-        "code": "MISSING_CONDITION",
-        "message": "The second condition in Branch 1 is missing from the English explanation."
+        "code": "MISSING_BRANCH",
+        "message": "Second branch mentioned in English explanation is missing and has incorrect information."
       },
       {
-        "code": "MISMATCH_CONDITION",
-        "message": "The condition in Branch 2 does not match between the English explanation and the rule extraction."
-      },
-      {
-        "code": "MISMATCH_CONDITION",
-        "message": "The condition in the DEFAULT branch does not match between the English explanation and the rule extraction."
-      },
-      {
-        "code": "MISMATCH_ACTION",
-        "message": "The action in the DEFAULT branch does not match between the English explanation and the rule extraction."
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT branch is also missing from the English explanation."
       }
     ]
   },
@@ -553,51 +418,642 @@
     "type": "reflection_issue",
     "issues": [
       {
-        "code": "MISMATCH_CONDITION",
-        "message": "The condition in Branch 1 does not match between the English explanation and the rule extraction."
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
       },
       {
-        "code": "MISSING_CONDITION",
-        "message": "The second condition in Branch 1 is missing from the English explanation."
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
       },
       {
-        "code": "MISMATCH_CONDITION",
-        "message": "The condition in Branch 2 does not match between the English explanation and the rule extraction."
-      },
-      {
-        "code": "MISMATCH_DEFAULT_CONDITION",
-        "message": "The condition in the DEFAULT branch does not match between the English explanation and the rule extraction."
-      },
-      {
-        "code": "MISMATCH_DEFAULT_ACTION",
-        "message": "The action in the DEFAULT branch does not match between the English explanation and the rule extraction."
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
       }
     ]
   },
   {
     "type": "reflection_issue",
     "issues": [
-      "The English explanation does not fully match the rule extraction: The provided JSON contains branches with conditions, but the English explanation states that it does not contain any specific rules or conditions."
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
     ]
   },
   {
     "type": "reflection_issue",
     "issues": [
       {
-        "code": "MISMATCH_BRANCH_CONDITION_1",
-        "message": "The condition in Branch 1 does not match between the English explanation and the rule extraction. Expected: referenceFile.contains(transaction.referenceNumber), Actual: (missing)"
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
       },
       {
-        "code": "MISSING_CONDITION_2",
-        "message": "The second condition in Branch 1 is missing from the English explanation."
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
       },
       {
-        "code": "MISMATCH_BRANCH_CONDITION_2",
-        "message": "The condition in Branch 2 does not match between the English explanation and the rule extraction. Expected: stringhelper.isEmpty(data[3]), Actual: (missing)"
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
       },
       {
-        "code": "MISMATCH_DEFAULT_BRANCH_ACTION",
-        "message": "The action in the DEFAULT branch does not match between the English explanation and the rule extraction. Expected: output.getValidContextSetting().setTerminateFurther(true), Actual: (missing)"
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information in English explanation."
+      },
+      {
+        "code": "MISSING",
+        "message": "DEFAULT branch is missing in English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "The English explanation does not fully match the rule extraction. The explanation mentions a series of error messages and warnings, but the rule extraction details actual conditions and variables."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "Lack of context or information about the rule extraction process itself."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction.",
+      "The explanation mentions a list of error messages and warnings, but the rule extraction only contains one branch condition and actions.",
+      "The explanation also asks for clarification on specific information regarding the rule extraction, but the provided rule extraction details are already clear and complete."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not mention the condition 'transaction.countLastMinute > threshold' which is present in the rule extraction.",
+      "The English explanation does not mention any of the variables extracted, such as 'Transaction', 'VELOCITY_EXCEEDED', etc."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction."
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction.",
+      "The explanation mentions a list of error messages and warnings, but the rule extraction only contains one branch condition and actions.",
+      "The explanation asks for clarification on specific information regarding the rule extraction, but the provided rule extraction details are clear and complete."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      "The English explanation does not fully match the rule extraction. It mentions a series of error messages and warnings, but the rule extraction only contains one branch condition and actions."
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not accurately reflect the rule extraction."
+      },
+      {
+        "code": "INCOMPLETE",
+        "message": "Second branch is missing and has incorrect information."
+      },
+      {
+        "code": "MISSING_DEFAULT_BRANCH",
+        "message": "DEFAULT/else branch is missing."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction"
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not present in the rule extraction"
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction"
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not explicitly stated in the rule extraction"
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "MISMATCH",
+        "message": "English explanation does not fully match the rule extraction"
+      },
+      {
+        "code": "EXTRA_INFO",
+        "message": "Explanation mentions 'no action is taken', which is not present in the rule extraction"
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "EXPLANATION_INACCURACY",
+        "message": "The English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "The explanation lacks context or information about the rule extraction process itself."
+      },
+      {
+        "code": "INCONSISTENT_VARIABLES",
+        "message": "The English explanation does not mention some of the variables extracted, such as 'Transaction', 'VELOCITY_EXCEEDED', etc."
+      },
+      {
+        "code": "MISSING_CONDITIONS",
+        "message": "The condition 'transaction.countLastMinute > threshold' present in the rule extraction is missing from the English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "EXPLANATION_INACCURACY",
+        "message": "The English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "The explanation lacks context or information about the rule extraction process itself."
+      },
+      {
+        "code": "INCONSISTENT_VARIABLES",
+        "message": "The English explanation does not mention some of the variables extracted, such as 'Transaction', 'VELOCITY_EXCEEDED', etc."
+      },
+      {
+        "code": "MISSING_CONDITIONS",
+        "message": "The condition 'transaction.countLastMinute > threshold' present in the rule extraction is not included in the English explanation."
+      }
+    ]
+  },
+  {
+    "type": "reflection_issue",
+    "issues": [
+      {
+        "code": "EXPLANATION_INACCURACY",
+        "message": "The English explanation does not fully match the rule extraction details."
+      },
+      {
+        "code": "MISSING_CONTEXT",
+        "message": "The explanation lacks context or information about the rule extraction process itself."
       }
     ]
   }

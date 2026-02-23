@@ -1,0 +1,93 @@
+{
+  "run_id": "635a2557-22f4-4117-b677-a7c63c7ea924",
+  "started_at": 1770404849.1019287,
+  "ended_at": 1770404849.1065216,
+  "steps": [
+    {
+      "name": "start",
+      "ts": 1770404849.1019351,
+      "data": {
+        "status": "ok",
+        "summary": "Run started",
+        "mode": "diff",
+        "model": "llama3.1",
+        "inputs": 1
+      }
+    },
+    {
+      "name": "plan:set",
+      "ts": 1770404849.1019387,
+      "data": {
+        "status": "ok",
+        "summary": "Plan created",
+        "goal": "diff",
+        "steps": [
+          "parse",
+          "parse",
+          "diff"
+        ]
+      }
+    },
+    {
+      "name": "parse",
+      "ts": 1770404849.1062381,
+      "data": {
+        "status": "ok",
+        "summary": "Parsed rule {'globals': [], 'branches': [{'condition': 'referenceFile.contains(transaction.referenceNumber)', 'actions': []}], 'variables': ['DUPLICATE_TXN', 'Duplicate', 'detected', 'errorCode', 'errorMessage', 'referenceFile.contains', 'transaction', 'transaction.referenceNumber'], 'outputs': []}",
+        "span_id": "1b57a2e7-9b8f-464a-b195-17690abee470",
+        "index": 0,
+        "rule_hash": "c179da5494166dc9d40fdd339fd2ed0b1ac03ab5d60d8e9fe9f9cb9255cc2c42",
+        "branches": 1,
+        "outputs": [],
+        "cache": {
+          "globals": [],
+          "branches": [
+            {
+              "condition": "referenceFile.contains(transaction.referenceNumber)",
+              "actions": []
+            }
+          ],
+          "variables": [
+            "DUPLICATE_TXN",
+            "Duplicate",
+            "detected",
+            "errorCode",
+            "errorMessage",
+            "referenceFile.contains",
+            "transaction",
+            "transaction.referenceNumber"
+          ],
+          "outputs": []
+        }
+      }
+    },
+    {
+      "name": "action:end",
+      "ts": 1770404849.1062417,
+      "data": {
+        "status": "ok",
+        "summary": "Parse complete",
+        "span_id": "1b57a2e7-9b8f-464a-b195-17690abee470"
+      }
+    },
+    {
+      "name": "action:start",
+      "ts": 1770404849.106271,
+      "data": {
+        "status": "failed",
+        "summary": "Parse MVEL",
+        "span_id": "4a38f6d7-8e1c-4e31-8aff-9a40f66fc6b5",
+        "index": 1
+      }
+    },
+    {
+      "name": "diff_fallback",
+      "ts": 1770404849.1062753,
+      "data": {
+        "reason": "need 2 extractions",
+        "got": 1
+      }
+    }
+  ],
+  "final_output": "Diff requires two parsed rules, but fewer were available."
+}

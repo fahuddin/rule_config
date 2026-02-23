@@ -14,5 +14,5 @@ def plan_steps(mode: str) -> List[str]:
     if mode == "verify":
         return ["parse", "static_checks", "retrieve_context", "explain", "reflect", "verify", "rewrite"]
     if mode == "explain":
-        return ["parse", "retrieve_context", "explain", "reflect", "rewrite"]
+        return ["parse", "retrieve_context", "explain"]
     return ["parse", "static_checks", "retrieve_context", "explain", "verify", "rewrite"]

@@ -163,18 +163,25 @@ def generate_description():
         if isinstance(result, str):
             result = {"output": result, "trace": None}
     except Exception as e:
-        logging.exception('LLM generation failed')
-        text = ''
+        logging.exception("Error running agent")
+        result = {"output": f"Error running agent: {e}", "trace": None}
 
-    cleaned = _clean_text(text, definition)
-    # store in cache
-    try:
-        with _cache_lock:
-            _desc_cache[key] = (cleaned, time.time())
-    except Exception:
-        logging.exception('Failed to write cache')
+    text = (result.get("output") or "").strip()
+    trace = result.get("trace")
 
-    return jsonify({'description': cleaned}), 200
+    cleaned = _clean_text(text)
+
+    payload = {"description": cleaned, "trace": trace}
+
+    if not force:
+        try:
+            with _cache_lock:
+                _desc_cache[key] = (payload, time.time())
+        except Exception:
+            logging.exception('Failed to write cache')
+
+    return jsonify(payload), 200
+
 
 @app.route("/api/rules/<rule_id>/description", methods=["POST"])
 def api_save_description(rule_id):
