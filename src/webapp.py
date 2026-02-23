@@ -73,7 +73,6 @@ def api_rule(rule_id):
 
 
 
-# API: generate a short user-facing description from a rule definition using the local LLM
 @app.route('/api/generate-description', methods=['POST'])
 def generate_description():
     data = request.get_json(force=True) or {}
@@ -85,19 +84,97 @@ def generate_description():
     
     if not definition:
         return jsonify({'description': ''}), 200
+
+    result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=trace)
+    mode = data.get('mode', "verify")
+    force = bool(data.get('force', False))
+
+    def _clean_text(text: str) -> str:
+        if not text:
+            return ''
+        t = text.strip()
+        t = re.sub(r"^\s*(Here is(?: a)?(?: .*?)?:|Here\'s:?|Here you go:?|Here you are:?|Assistant:|Response:)\s*\n*", '', t, flags=re.I)
+        t = re.sub(r"^.*?:\s*\n+", '', t, count=1)
+        t = re.sub(r"[\x00-\x1f\x7f]+", ' ', t)
+        t = re.sub(r"\s+", ' ', t).strip()
+
+        sentences = re.split(r'(?<=[\.!?;:])\s+', t)
+
+        def word_set(s: str):
+            return set([w for w in re.findall(r"\w+", s.lower())])
+
+        def is_restatement(s: str) -> bool:
+            if len(s.strip()) < 10:
+                return True
+            if re.match(r"^\s*(the rule|this rule|it checks|it validates|it ensures|it verifies|ensures|verifies|validates|checks)\b", s.strip(), flags=re.I):
+                return True
+            if re.search(r"\balternatively\b|\balso\b|\bin summary\b|\bfor example\b", s, flags=re.I):
+                return True
+
+            def_words = word_set(definition)
+            sent_words = word_set(s)
+            if not def_words or not sent_words:
+                return False
+
+            overlap = len(def_words & sent_words) / max(1, len(def_words))
+            overlap_sent = len(def_words & sent_words) / max(1, len(sent_words))
+            if overlap > 0.45 or overlap_sent > 0.45:
+                return True
+
+            if 'validation' in s.lower() and 'account' in s.lower():
+                return True
+            return False
+
+        kept = []
+        for s in sentences:
+            if not s or is_restatement(s):
+                continue
+            kept.append(s.strip())
+
+        out = ' '.join(kept).strip()
+        if not out:
+            out = t
+
+        out = out.strip()
+        out = out.replace('"', '').replace("'", '')
+        out = out.replace('“', '').replace('”', '').replace('‘', '').replace('’', '')
+        out = out.replace('«', '').replace('»', '')
+        out = re.sub(r"[\r\n]+", ' ', out)
+        out = re.sub(r"\s+", ' ', out).strip()
+        return out
+
+    # ✅ cache key MUST include mode (and preferably force doesn't cache anyway)
+    key = hashlib.sha256((definition + '||' + model + '||' + mode).encode('utf-8')).hexdigest()
+
+    # ✅ Cache read (return BOTH description + trace so UI updates even on cache hits)
+    if not force:
+        with _cache_lock:
+            entry = _desc_cache.get(key)
+            if entry:
+                payload, ts = entry
+                if time.time() - ts < CACHE_TTL:
+                    return jsonify(payload), 200
+                else:
+                    del _desc_cache[key]
+
+    # ✅ Always define result/text/trace
     try:
-        result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=trace)
+        result = run(mode=mode, mvel_texts=[definition], model=model, enable_trace=True)
+        if isinstance(result, str):
+            result = {"output": result, "trace": None}
     except Exception as e:
-        result = f"Error running agent: {e}"
-    
-    
+        logging.exception('LLM generation failed')
+        text = ''
 
-    # cache key based on normalized definition and model
-     # cache key based on normalized definition and model
+    cleaned = _clean_text(text, definition)
     # store in cache
+    try:
+        with _cache_lock:
+            _desc_cache[key] = (cleaned, time.time())
+    except Exception:
+        logging.exception('Failed to write cache')
 
-    return jsonify({'description': result}), 200
-
+    return jsonify({'description': cleaned}), 200
 
 @app.route("/api/rules/<rule_id>/description", methods=["POST"])
 def api_save_description(rule_id):
