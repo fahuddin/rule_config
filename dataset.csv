@@ -1,0 +1,24 @@
+﻿id,rule_name,rule_definition,english
+1,inputMessageCheck,"(input.message != null && input.message.equalsIgnoreCase(""MT"")) &&
+(input.estimate != null && input.estimate.equalsIgnoreCase(""Actual"")) &&
+(input.clientId == null || input.clientId.equals(""N""))","The condition passes when the message is “MT”, the estimate is “Actual”, and the client ID is either missing or set to “N”."
+2,inputMessageCheck,"(input.message != null && input.message.equalsIgnoreCase(""CASH"")) &&
+(input.estimateCode != null && input.estimateCode.equalsIgnoreCase(""Actual""))",The rule passes when the message is “CASH” and the estimate code is “Actual.”
+3,inputMessageValidation,"(input.message != null && input.message.equalsIgnoreCase(""SFT CONNECTED"")) &&
+(input.estimate != null && input.estimate.equalsIgnoreCase(""Money"")) &&
+(input.clientId != null && input.clientId.equals(""Y""))","The rule passes when the message is “SFT CONNECTED,” the estimate is “Money,” and the client ID is present and set to “Y.”"
+4,inputMessageValidation,"(input.message != null && input.message.equalsIgnoreCase(""stoink"")) && 
+(input.estimateCode != null && input.estimateCode.equalsIgnoreCase(""Actual"")) && 
+(input.sender != null && input.sender.equalsIgnoreCase(""STOINK ULTRA PRO MAX""))","The rule passes when the message is “stoink,” the estimate code is “Actual,” and the sender is exactly “STOINK ULTRA PRO MAX.”"
+5,inputSender,"(input.message != null && input.message.equalsIgnoreCase(""nothing trade"")) && 
+(input.estimateCode != null && input.estimateCode.equalsIgnoreCase(""Actual"")) && 
+(input.sender != null && input.sender.equalsIgnoreCase(""DFS"")) && 
+(input.entityFlag != null && input.entityFlag.equals(""N""))","The rule passes when the message is “nothing trade,” the estimate code is “Actual,” the sender is “DFS,” and the entity flag is present and set to “N.”"
+6,cashRefValidation,"(input.message != null && input.message.equalsIgnoreCase(""MT"")) && (input.moneyCode != null && input.moneyCode.equalsIgnoreCase(""Money"")) && (input.clientId == null || input.clientId.equals(""N"")) && (input.Cashref == null || !input.Cashref.equalsIgnoreCase(""TERMINATED""))","The rule passes when the message is “MT,” the money code is “Money,” the client ID is missing or set to “N,” and the cash reference is either missing or not marked as “TERMINATED.”"
+7,inputMessageCode,"(input.message != null && input.message.equalsIgnoreCase(""ABC"")) &&
+(input.moneyCode != null && input.moneyCode.equalsIgnoreCase(""Money"")) &&
+(input.workType != null && input.workType.equalsIgnoreCase(""regular"")) &&
+(input.transaction != null && input.transaction.equals(""Y""))","The rule passes when the message is “ABC,” the money code is “Money,” the work type is “regular,” and the transaction flag is present and set to “Y.”"
+8,inputAdvise,(input.message != null && (input.message.equalsIgnoreCase('MT') || input.message.equalsIgnoreCase('MT') || input.message.equalsIgnoreCase('saipan') || input.message.equalsIgnoreCase('CA'))) && (input.moneyCode != null && input.moneyCode.equalsIgnoreCase('Actual')) && (input.transaction != null && input.transaction.equalsIgnoreCase('CAPITAL HILL')) && (input.advise != null && input.advise == 'Y'),"The rule passes when the message is MT, saipan, or CA, the money code is “Actual,” the transaction is “CAPITAL HILL,” and the advise flag is set to “Y.”"
+9,inputMessage,(input.message != null && input.message.equalsIgnoreCase('ABC')) && (input.estimate != null && input.estimate.equalsIgnoreCase('money')) && (input.srcworkType != null && input.srcworkType.equalsIgnoreCase('normal')) && (input.clientId != null && input.clientId != 'Y') && (input.transactionIndex == 'N') && (input.Ref.contains('CASH MONEY HEROES')),"The rule passes when the message is “ABC,” the estimate is “money,” the work type is “normal,” the client ID exists but is not “Y,” the transaction index is “N,” and the reference text includes “CASH MONEY HEROES.”"
+10,inputTransactionType,(input.message != null && (input.message.equalsIgnoreCase('FT900') || input.messageTypeCode.equalsIgnoreCase('FT500') || input.message.equalsIgnoreCase('SSN') || input.message.equalsIgnoreCase('MT'))) && (input.estimate != null && input.estimate.equalsIgnoreCase('Actual')) && (input.transaction != null && input.transactionCode.equalsIgnoreCase('CAPITAL HILL')) && (input.entityFlag != null && input.entityFlag == 'Y'),"The rule passes when the message is FT900, SSN, or MT (or the message type code is FT500), the estimate is “Actual,” the transaction code is “CAPITAL HILL,” and the entity flag is set to “Y.”"
