@@ -1,1 +1,3 @@
 *.mvel
+*.env
+*.csv
