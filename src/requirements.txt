@@ -2,3 +2,14 @@ langchain
 langchain-ollama
 langchain-core
 flask
+streamlit
+redis
+pandas
+numpy
+scikit-learn
+sentence-transformers
+accelerate
+requests
+rapidfuzz
+datasets
+transformers
