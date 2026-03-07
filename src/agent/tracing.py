@@ -15,9 +15,16 @@ class Trace:
         self.final_output: Optional[str] = None
 
     def log_step(self, name: str, data: Dict[str, Any]):
+        if not self.enabled:
+            return
+        ts = time.time()
+        summary = data.get("summary", "")
+        status = data.get("status", "ok")
+        elapsed = round(ts - self.started_at, 3)
+        print(f"[trace] +{elapsed}s  [{status}]  {name}" + (f"  — {summary}" if summary else ""))
         self.steps.append({
             "name": name,
-            "ts": time.time(),
+            "ts": ts,
             "data": data
         })
     

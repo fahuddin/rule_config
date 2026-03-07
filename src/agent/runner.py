@@ -93,7 +93,7 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
     for step in steps:
         if step == "translate":
             english = mvel_texts
-            mvel = generate_mvel(english)
+            mvel = explain_rule(english)
             return mvel
         if step == "parse":
             s = span()
@@ -145,22 +145,22 @@ def run(mode: str, mvel_texts: List[str], model: str, enable_trace: bool) -> str
             log(trace, "action:end", span_id=s, summary="Context retrieval complete")
 
         elif step == "explain":
+            s = span()
             if not extractions:
                 english = "could not parse any rule branches from the provided MVEL."
-                log(trace, "action:end", span_id=s, summary="english skipped because could not parse")
+                log(trace, "explain:skip", span_id=s, status="skip", summary="Explain skipped — no extraction available")
                 continue
 
             if rule_hash:
                 cached = get_cached_explanation(rule_hash)
                 if cached:
-                    log(trace, "explain", span_id=s, summary="Used cached explanation", english_chars=len(english), cache="hit")
-                    # use cached explanation but continue pipeline so downstream steps can run
                     english = cached
+                    log(trace, "explain", span_id=s, summary="Used cached explanation", english_chars=len(english), cache="hit")
                 else:
+                    log(trace, "explain:start", span_id=s, status="running", summary="Calling LLM to generate English explanation")
                     english = explain_rule(llm, extractions[-1], context)
-                    log(trace, "explain", span_id=s, summary="{english}")
-                    set_cached_explanation(rule_hash, english)        
-            log(trace, "explain", span_id=s, summary="Generated explanation", english_chars=len(english), cache="miss")
+                    set_cached_explanation(rule_hash, english)
+                    log(trace, "explain", span_id=s, summary=f"Generated explanation: {len(english)} chars", english_chars=len(english), cache="miss")
             log(trace, "action:end", span_id=s, summary="Explain complete")
         elif step == "verify":
             if not extractions or not english:

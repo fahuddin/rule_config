@@ -179,6 +179,27 @@
             </div>
 
             <div style="margin-top:12px" class="section">
+              <h3>Trace Information</h3>
+              <div id="traceContainer" style="display:none">
+                <div style="margin-bottom:12px">
+                  <div class="muted"><strong>Run ID:</strong> <span class="mono" id="traceRunId">-</span></div>
+                  <div class="muted"><strong>Status:</strong> <span id="traceStatus">idle</span></div>
+                  <div class="muted"><strong>Duration:</strong> <span id="traceDuration">-</span></div>
+                </div>
+                
+                <div style="max-height:400px;overflow-y:auto">
+                  <h4 style="margin:8px 0 6px;font-size:12px;font-weight:600">Steps</h4>
+                  <div id="traceSteps" style="font-size:11px;font-family:monospace">
+                    <div class="muted">No steps yet</div>
+                  </div>
+                </div>
+              </div>
+              <div id="traceEmpty" class="muted">
+                Trace information appears here when you run the agent.
+              </div>
+            </div>
+
+            <div style="margin-top:12px" class="section">
               <h3>Help</h3>
               <div class="muted">
                 Pick Application/Sub-module/Type to filter rules. Run the agent for explain/diff/verify/tests.
@@ -214,15 +235,87 @@
       const refreshBtn = document.getElementById('refreshBtn');
       const statusText = document.getElementById('statusText');
 
+      // Trace elements
+      const traceContainer = document.getElementById('traceContainer');
+      const traceEmpty = document.getElementById('traceEmpty');
+      const traceRunId = document.getElementById('traceRunId');
+      const traceStatus = document.getElementById('traceStatus');
+      const traceDuration = document.getElementById('traceDuration');
+      const traceSteps = document.getElementById('traceSteps');
+
       // Data
       let allRules = [];
       let selectedRule = null;
       let currentGenId = 0;
+      let currentTrace = null;
 
       const model = "llama3.1"; // default; add a selector if needed
 
       // Helpers
       const uniq = (arr) => [...new Set(arr.filter(v => String(v || '').trim() !== ''))];
+
+      function formatDuration(startTs, endTs) {
+        const ms = (endTs - startTs) * 1000;
+        if (ms < 1000) return Math.round(ms) + "ms";
+        return (ms / 1000).toFixed(1) + "s";
+      }
+
+      function displayTrace(trace) {
+        if (!trace) {
+          traceContainer.style.display = 'none';
+          traceEmpty.style.display = 'block';
+          return;
+        }
+
+        currentTrace = trace;
+        traceContainer.style.display = 'block';
+        traceEmpty.style.display = 'none';
+
+        traceRunId.textContent = trace.run_id || '-';
+        
+        const duration = formatDuration(trace.started_at, trace.ended_at);
+        traceDuration.textContent = duration;
+        traceStatus.textContent = trace.steps.length > 0 ? 'completed' : 'idle';
+        traceStatus.className = trace.steps.length > 0 ? 'ok' : '';
+
+        // Render steps
+        if (trace.steps && trace.steps.length > 0) {
+          let stepsHtml = '';
+          let prevTs = trace.started_at;
+
+          trace.steps.forEach((step, idx) => {
+            const elapsed = formatDuration(trace.started_at, step.ts);
+            const stepDuration = formatDuration(prevTs, step.ts);
+            const status = step.data && step.data.status ? step.data.status : 'ok';
+            const summary = step.data && step.data.summary ? step.data.summary : '';
+            const statusClass = status === 'ok' ? 'ok' : status === 'warn' ? 'warn' : '';
+
+            stepsHtml += `<div style="margin:6px 0; padding:6px; background:var(--soft); border-radius:4px; border-left:3px solid ${getStatusColor(status)}">
+              <div><strong>[${elapsed}]</strong> <span class="status ${statusClass}">${status.toUpperCase()}</span> ${step.name}</div>`;
+            
+            if (summary) {
+              stepsHtml += `<div style="margin-top:3px; color:var(--muted)">${escapeHtml(summary)}</div>`;
+            }
+            stepsHtml += '</div>';
+            prevTs = step.ts;
+          });
+
+          traceSteps.innerHTML = stepsHtml;
+        } else {
+          traceSteps.innerHTML = '<div class="muted">No steps recorded.</div>';
+        }
+      }
+
+      function getStatusColor(status) {
+        if (status === 'ok' || status === 'good') return 'var(--good)';
+        if (status === 'warn') return 'var(--warn)';
+        return 'var(--border)';
+      }
+
+      function escapeHtml(text) {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, m => map[m]);
+      }
 
       function setStatus(msg, kind="") {
         statusText.className = "status " + (kind || "");
@@ -337,6 +430,14 @@
         agentBtn.disabled = true;
 
         setStatus(`Agent running in "${modeToUse}" mode...`, "");
+        
+        // Show trace as running
+        displayTrace({
+          run_id: 'pending',
+          started_at: Date.now() / 1000,
+          ended_at: Date.now() / 1000,
+          steps: [{ name: 'Initializing...', ts: Date.now() / 1000, data: { status: 'ok' } }]
+        });
 
         // Flask reads mode from request.form in your snippet, but easiest is querystring.
         fetch(`/api/generate-description?mode=${encodeURIComponent(modeToUse)}`, {
@@ -352,6 +453,11 @@
 
           if (selectedRule) selectedRule.rule_desc = out;
 
+          // Update trace if provided
+          if (data && data.trace) {
+            displayTrace(data.trace);
+          }
+
           setStatus("Agent finished.", "ok");
         })
         .catch(err => {
@@ -359,6 +465,7 @@
           console.warn('Agent call failed:', err);
           ruleDesc.value = '';
           setStatus("Agent failed. Check server logs.", "warn");
+          displayTrace(null);
         })
         .finally(() => {
           regenerateBtn.disabled = false;
